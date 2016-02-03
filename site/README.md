@@ -1,0 +1,495 @@
+# gcloud Shared Docs App
+
+## Table of Contents
+
+* [Installation][installation]
+* [Previewing Locally][previewing]
+  * [Previewing with `gh-pages`][previewing-ghpages]
+* [Manifest][manifest]
+  * [`lang`][lang-key]
+  * [`friendlyLang`][friendlylang-key]
+  * [`markdown`][markdown-key]
+  * [`versions`][versions-key]
+  * [`content`][content-key]
+  * [`home`][home-key]
+  * [`overview`][overview-key]
+  * [`guides`][guides-key]
+  * [`services`][services-key]
+  * [`package`][package-key]
+* [JSON Docs Schema][json-schema]
+  * [`id`][id-key]
+  * [`description` and `caption`][description-keys]
+  * [`metadata`][metadata-key]
+  * [`methods`][methods-key]
+    * [`metadata`][metadata-key-1]
+    * [`params`][params-key]
+    * [`exceptions`][exceptions-key]
+    * [`returns`][returns-key]
+  * [Custom Data Types][custom-types]
+* [Misc. Content][misc-content]
+  * [Landing Page][landing-page]
+  * [Overview Section][overview-section]
+  * [Custom Page Headers][custom-page-headers]
+* [Deploying][deploying]
+
+## Installation
+
+Install `bower` and `gulp` globally. You'll need to install [Node.js][nodejs] if it isn't already.
+
+```sh
+$ npm install -g gulp-cli bower
+```
+
+Clone the gcloud-common repository
+
+```sh
+$ git clone git@github.com:GoogleCloudPlatform/gcloud-common.git
+$ cd gcloud-common/site
+```
+
+Install all the things!
+
+```sh
+$ bower install
+$ npm install
+```
+
+Now we can start the local webserver via `gulp`. This will launch a browser window.
+
+```sh
+$ gulp serve
+```
+
+## Previewing Locally
+
+In order to test locally you'll need a [<kbd>manifest.json</kbd>][manifest] file as well as content directory containing your [JSON docs][json-schema].
+
+For testing purposes these should both be placed directly within the `src` directory.
+
+Your <kbd>src</kbd> directory should then resemble something like the following
+
+```sh
+gcloud-common/site/src
+ ├─── app # front-end application files
+ ├─── assets # images, etc.
+ ├─── versions # JSON content folder
+ |     └─── v0.28.0 # one folder per release
+ |           └─── storage # one folder per service
+ |                 ├─── index.json # one file per class/module/etc.
+ |                 └─── bucket.json
+ ├─── index.html
+ └─── manifest.json
+```
+
+For a living example, refer to gcloud-node's [gh-pages][gcloud-node-ghpages]. *Please note* their content directory is called <kbd>json</kbd>.
+
+### Previewing with `gh-pages`
+
+If you already have the docs app deployed to your gcloud library's `gh-pages` branch, this can make testing a whole lot easier. Since the application is already built, you can simply checkout the `gh-pages` branch and add your JSON to the <kbd>master</kbd> directory.
+
+**Note:** some browsers may require you to disable web security to make local http requests, you can circumvent this by running a local web server.
+
+## Manifest
+
+The <kbd>manifest.json</kbd> is used to supply the Angular application with the necessary information to display your documentation properly. Please refer to the [schema][manifest-schema] for more information.
+
+##### `lang` key
+
+This is the non-friendly name for your language, it will be used to generate links to github, stackoverflow, etc. It's also used internally within the application for [language specific hooks][custom-page-headers]
+
+```js
+{
+  "lang": "node"
+}
+```
+
+##### `friendlyLang` key
+
+This is the user-friendly version of your language name, in some cases it may be displayed to the user as a title or link text.
+
+```js
+{
+  "friendlyLang": "Node.js"
+}
+```
+
+##### `markdown` key
+
+The Angular app currently leverages a code highlighting library called [highlightjs][hljs]. The `markdown` field specifies the flavor of syntax highlighting to use.
+
+```js
+{
+  "markdown": "javascript"
+}
+```
+
+For a complete list of available languages, please refer to the [highlightjs docs][hljs-languages].
+
+##### `versions` key
+
+This is a list of all available versions the user can switch between when browsing the documentation.
+
+Each version should comply with [semver][semver]. The only exception to this rule is `master`.
+
+```js
+{
+  "versions": [
+    "v0.27.0",
+    "v0.26.0",
+    "master"
+  ]
+}
+```
+
+##### `content` key
+
+This specifies the directory where your JSON docs reside.
+
+```js
+{
+  "content": "versions"
+}
+```
+
+##### `home` key
+
+For the landing page of the documentation, it was decided (*see [gcloud-common#44](https://github.com/GoogleCloudPlatform/gcloud-common/issues/44)*) to simply use html files since they differ from language to language.
+
+```js
+{
+  "home": "home.html"
+}
+```
+
+See the [Landing Page section][landing-page] for more information.
+
+##### `overview` key
+
+**Note:** *This field is completely optional.*
+
+When supplied, the overview field maps to an html file that resembles a quick-start guide.
+
+```js
+{
+  "overview": "overview.html"
+}
+```
+
+See the [Overview section][overview-section] for more information.
+
+##### `guides` key
+
+This will act as a table of contents for the *Getting Started* section of the documentation site.
+
+Currently guides are composed of markdown files, you can include as many markdown files within a guide as you like. Any local guides detected will assume to be versioned, so <kbd>authentication.md</kbd> will essentially point to <kbd>versions/v0.28.0/authentication.md</kbd>.
+
+Optionally you can also provide an `edit` field, which should map to a URL that allows the user to edit the guide content.
+
+```js
+{
+  "guides": [{
+    "title": "Authentication", // title of guide
+    "id": "authentication", // id used for content lookup and generating guide url
+    "edit": "https://github.com/GoogleCloudPlatform/gcloud-common/edit/master/authentication/readme.md",
+    "contents": [
+      "https://raw.githubusercontent.com/GoogleCloudPlatform/gcloud-common/master/authentication/readme.md",
+      "authentication.md"
+    ]
+  }]
+}
+```
+
+##### `services` key
+
+The services section is very similar to the [guides section][guides-key]. This key will act as a table of contents for the *API* section of the documentation site. Instead of markdown, this section of the docs is driven by [JSON][json-schema].
+
+Since there is only a single manifest for all versions (at least for now) you can add a key called `implemented` to specify what versions this service is available in.
+
+You can also create nested sections for the various service concepts via `nav` key. The objects that occupy the `nav` array match that of the `service` array.
+
+```js
+{
+  "services": [{
+    "title": "title": "Storage",
+    "id": "storage",
+    "implemented": ">=0.10.0",
+    "contents": "storage/index.json",
+    "nav": [{
+      "title": "Bucket",
+      "id": "bucket",
+      "contents": "storage/bucket.json"
+    }]
+  }]
+}
+```
+
+##### `package` key
+
+This allows you to specify what package manager you use and a direct link to your package.
+
+```js
+{
+  "package": {
+    "title": "npm",
+    "href": "https://www.npmjs.com/package/gcloud"
+  }
+}
+```
+
+See the [JSON Docs Schema section][json-schema] for more information.
+
+## JSON Docs Schema
+
+Please refer to the [schema][json-schema] for more detailed information.
+
+##### `id` key
+
+This is the id for the service.
+
+```js
+{
+  "id": "storage"
+}
+```
+
+##### `description` and `caption` keys
+
+Throughout the JSON structure there will be several instances of the `description` and `caption` keys, these should be wrapped in `<p>` tags.
+
+```js
+{
+  "description": "<p>Hello, world!</p>"
+}
+```
+
+##### `metadata` key
+
+The top-level metadata object contains a friendly name for the service. Optionally you can provide a service description and external links.
+
+```js
+{
+  "metadata": {
+    "name": "Storage",
+    "description": "<p>Storage is cool!</p>", // optional
+    "resources": [{ // optional
+      "title": "Storage Overview",
+      "link": "https://storage-is-cool.com"
+    }]
+  }
+}
+```
+
+##### `methods` key
+
+This field defines all the methods available for this service. Methods contain metadata for a method, a list of parameters, a list of exceptions and possible return values.
+
+```js
+{
+  "methods": [{
+    "metadata": {},
+    "params": [],
+    "exceptions": [],
+    "returns": []
+  }]
+}
+```
+
+###### `metadata` key
+
+This field is similar to the top-level metadata field, however it can also include several other items to better describe a method (examples, source code, etc.)
+
+```js
+{
+  "methods": [{
+    "metadata": {
+      "constructor": false, // we document constructors/modules in the same fashion as methods
+      "name": "createBucket", // method name -> Storage#createBucket
+      "source": "/lib/storage/index.js#L270", // github path for deeplinking
+      "description": "<p>Create a bucket.</p>",
+      "examples": [{ // list of examples
+        "caption": "<p>Here's how you would create a bucket!</p>", // caption for example
+        "code": "storage.createBucket('new-bucket', callback);" // example code
+      }],
+      "resources": [{ // list of external resources
+        "title": "Buckets: insert API docs",
+        "link": "https://storage-is-cool.com/create-buckets/"
+      }]
+    }
+  }]
+}
+```
+
+###### `params` key
+
+This field is optional, when present it should contain a list of parameters that the method will accept.
+
+```js
+{
+  "methods": [{
+    "params": [{
+      "name": "callback",
+      "description": "<p>The callback function.</p>",
+      "types": ["function"],
+      "optional": true,
+      "nullable": false
+    }]
+  }]
+}
+```
+
+It's also possible to document nested keys or callback arguments by simply prefixing the key name with the object/callback name.
+
+```js
+{
+  "name": "callback.err",
+  "description": "<p>An error returned while making this request.</p>",
+  "types": ["error"],
+  "optional": false,
+  "nullable": true
+}
+```
+
+###### `exceptions` key
+
+This field is optional, when present it should contain a list of exceptions that the method can throw.
+
+```js
+{
+  "methods": [{
+    "exceptions": [{
+      "type": "Error", // error class
+      "description": "<p>If a bucket ID is not provided.</p>" // why it was thrown
+    }]
+  }]
+}
+```
+
+###### `returns` key
+
+This field is optional, when present it should contain a list of return values.
+
+```js
+{
+  "methods": [{
+    "returns": [{
+      "type": "Bucket",
+      "description": "<p>A storage/bucket object</p>"
+    }]
+  }]
+}
+```
+
+### Custom Data Types
+
+In some cases you may need to link to custom data types, this can happen pretty much anywhere (descriptions, param types, return types, exception types, etc.). If this is functionality that you need, you can instead return an `<a>` tag using a custom data attribute `custom-type`.
+
+```js
+{
+  "methods": [{
+    "returns": [{
+      "type": ["<a data-custom-type=\"storage/bucket\"></a>"],
+      "description": "<p>A storage/bucket object</p>"
+    }]
+  }]
+}
+```
+
+## Misc. Content
+
+While majority of the content on the doc app is driven by markdown and content, there are a couple of other sections driven by html.
+
+##### Landing Page
+
+Specify a landing page using the <kbd>manifest.json</kbd>'s [`home` key][home-key].
+
+For the landing page, you can create an html file that leverages Angular. There will be an object available to use within the template named `home`.
+
+The home object will resemble the following
+
+```js
+{
+  // information about the most recent release
+  "latestRelease": {
+    "name": "v0.28.0",
+    "date": 1455306471454,
+    "link": "https://github.com/GoogleCloudPlatform/gcloud-node/tree/v0.28.0"
+  }
+}
+```
+
+See a living example of gcloud-node's home template [here][gcloud-node-home].
+
+##### Overview Section
+
+Specify an overview using the <kbd>manifest.json</kbd>'s [`overview` key][overview-key].
+
+Overviews are completely optional, you can create one using html.
+
+See [gcloud-node docs][gcloud-node-docs] for a working demo. The contents of the overview file fill the *Getting Started with gcloud* section of the service pages.
+
+See a living example of gcloud-node's overview template [here][gcloud-node-overview].
+
+##### Custom Page Headers
+
+Different languages may wish for different formatting when it comes to page titles, when moving to the common-docs you can design a [template][page-header-template] to display the title how you wish.
+
+A `title` array containing the name hierarchy will be available for you.
+
+When visiting `/docs/latest/storage` the `title` array will resemble `['Storage']`.
+When visiting `/docs/latest/storage/bucket` the `title` array will resemble `['Storage', 'Bucket']`.
+
+## Deploying
+
+Integrating the shared docs app is fairly painless. There is a [shell script][gcloud-common-deploy] that will push the updated site code to your `gh-pages` after a successful merge. To enable this, simply append a command to push to your repo to the script.
+
+```sh
+deploy_docs "googlecloudplatform/gcloud-node"
+```
+
+You'll probably also need to create a custom build script in your repository to generate the documentation and move it to the appropriate version folder, etc.
+
+Please refer to gcloud-node's [`gh-pages` branch][gcloud-node-ghpages] for an example of how your content should be organized.
+
+[installation]: #installation
+[previewing]: #previewing-locally
+[previewing-ghpages]: #previewing-with-gh-pages
+[manifest]: #manifest
+[lang-key]: #lang-key
+[friendlylang-key]: #friendlylang-key
+[markdown-key]: #markdown-key
+[versions-key]: #versions-key
+[content-key]: #content-key
+[home-key]: #home-key
+[overview-key]: #overview-key
+[guides-key]: #guides-key
+[services-key]: #services-key
+[package-key]: #package-key
+[json-schema]: #json-docs-schema
+[id-key]: #id-key
+[description-keys]: #description-and-caption-keys
+[metadata-key]: #metadata-key
+[methods-key]: #methods-key
+[metadata-key-1]: #metadata-key-1
+[params-key]: #params-key
+[exceptions-key]: #exceptions-key
+[returns-key]: #returns-key
+[custom-types]: #custom-data-types
+[misc-content]: #misc-content
+[landing-page]: #landing-page
+[overview-section]: #overview-section
+[custom-page-headers]: #custom-page-headers
+[deploying]: #deploying
+
+[nodejs]: https://nodejs.org/en/
+[hljs]: https://highlightjs.org/
+[hljs-languages]: http://highlightjs.readthedocs.org/en/latest/css-classes-reference.html#language-names-and-aliases
+[semver]: http://semver.org/
+
+[gcloud-node-ghpages]: https://github.com/GoogleCloudPlatform/gcloud-node/tree/gh-pages
+[gcloud-node-home]: https://github.com/GoogleCloudPlatform/gcloud-node/blob/gh-pages/home.html
+[gcloud-node-overview]: https://github.com/GoogleCloudPlatform/gcloud-node/blob/gh-pages/json/v0.28.0/overview.html
+[gcloud-node-docs]: https://googlecloudplatform.github.io/gcloud-node/#/docs/latest/
+[gcloud-common-deploy]: https://github.com/GoogleCloudPlatform/gcloud-common/blob/master/deploy-docs.sh#L71
+[manifest-schema]: /site/schemas/manifest.json
+[json-schema]: /site/schemas/service.json
+[page-header-template]: https://github.com/GoogleCloudPlatform/gcloud-common/blob/master/site/src/app/components/page-header/page-header.directive.js#L8
