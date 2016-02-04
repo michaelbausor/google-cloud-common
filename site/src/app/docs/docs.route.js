@@ -7,6 +7,10 @@
 
   /** @ngInject */
   function docsRoutes($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider, manifest) {
+    // source: https://github.com/sindresorhus/semver-regex
+    var regSemver = '\\bv?(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-[\\da-z\-]+(?:\\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?\\b';
+    var latestVersion = manifest.versions[0];
+
     $urlMatcherFactoryProvider.type('nonURIEncoded', {
       encode: toString,
       decode: toString,
@@ -15,7 +19,14 @@
 
     $stateProvider
       .state('docs', {
-        url: '/docs/:version',
+        // ui-router allows one to optionally use a regular expressions to
+        // match uri parameters against. In this instance we're only allowing
+        // the version value to be "master" OR a valid semver version.
+        // If we receive a route that does NOT match one of these two values
+        // then we'll end up in the $urlRouterProvier.otherwise(...) block
+        // which will look for version alias's or the absense of a version
+        // and redirect the user appropriately
+        url: '/docs/{version:master|' + regSemver + '}',
         templateUrl: 'app/docs/docs.html',
         controller: 'DocsCtrl',
         controllerAs: 'docs',
@@ -23,7 +34,7 @@
           lastBuiltDate: getLastBuiltDate
         },
         params: {
-          version: manifest.versions[0]
+          version: latestVersion
         },
         redirectTo: 'docs.service'
       })
@@ -46,6 +57,28 @@
       });
 
     $urlRouterProvider.when('/docs', goToGcloud);
+
+    $urlRouterProvider.otherwise(function($injector, $location) {
+      var baseUrl = '/docs/';
+      var versions = $injector.get('manifest').versions;
+      var params = $location.path().replace(baseUrl, '').split('/');
+      var isValidVersion = versions.indexOf(params[0]) !== -1;
+
+      // could be a bad service name
+      if (isValidVersion) {
+        return baseUrl + params[0];
+      }
+
+      // could be a version alias
+      if (params[0] === 'latest' || params[0] === 'stable') {
+        params[0] = latestVersion;
+      } else {
+        // otherwise let's assume the version was omitted entirely
+        params.unshift(latestVersion);
+      }
+
+      return baseUrl + params.join('/');
+    });
   }
 
   /** @ngInject */
@@ -89,30 +122,17 @@
       pageTitle.push(service.title);
     }
 
-    if (!service) {
-      return goToDefaultState();
-    }
-
     var json = $interpolate('{{content}}/{{version}}/{{data}}')({
       content: manifest.content,
       version: $stateParams.version,
       data: service.contents
     });
 
-    return $http.get(json)
-      .then(function(response) {
-        var data = response.data;
-        data.metadata.title = pageTitle;
-        return data;
-      })
-      .then(null, goToDefaultState);
-
-    function goToDefaultState() {
-      var params = { version: $stateParams.version };
-      var options = { inherit: false };
-
-      return $state.go('docs.service', params, options);
-    }
+    return $http.get(json).then(function(response) {
+      var data = response.data;
+      data.metadata.title = pageTitle;
+      return data;
+    });
   }
 
   /** @ngInject */
