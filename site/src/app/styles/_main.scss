@@ -431,6 +431,7 @@ ul {
 .language-switcher--home .menu {
     position: absolute;
     bottom: initial;
+    z-index: 1;
 }
 
 .page-header.fixed .menu {
