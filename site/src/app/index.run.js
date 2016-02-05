@@ -16,10 +16,15 @@
       }
     });
 
-    // uncomment for debugging
-    // $rootScope.$on('$stateChangeError', function() {
-    //   console.log(arguments);
-    // });
+    $rootScope.$on('$stateChangeError', function() {
+      // uncomment for debugging
+      // console.log(arguments);
+
+      $state.go('docs.service', {
+        version: $state.params.version,
+        serviceId: 'gcloud'
+      });
+    });
   }
 
 }());
