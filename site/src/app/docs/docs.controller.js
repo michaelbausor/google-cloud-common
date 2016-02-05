@@ -16,15 +16,20 @@
     docs.services = angular.copy(manifest.services).filter(isAvailable);
     docs.services.forEach(updateNav);
     docs.version = $state.params.version;
+    docs.overviewFileUrl = null;
+
     docs.selectedVersion = docs.version;
-    docs.overview = [
-      manifest.content,
-      $state.params.version,
-      manifest.overview
-    ].join('/');
     docs.loadVersion = loadVersion;
     docs.getGuideUrl = getGuideUrl;
     docs.isActive = isActive;
+
+    if (manifest.overview) {
+      docs.overviewFileUrl = [
+        manifest.content,
+        $state.params.version,
+        manifest.overview
+      ].join('/');
+    }
 
     function loadVersion(version) {
       return $state.go($state.current.name, { version: version });
