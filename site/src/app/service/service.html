@@ -1,19 +1,21 @@
 <page-header title="service.title"></page-header>
 <version-switcher class="invisible-lg side-nav--meta--top"></version-switcher>
 <article class="content">
-  <h3 class="sub-heading toggle" ng-click="service.showGettingStarted = !service.showGettingStarted">
-    <div class="toggler">
-      <span ng-if="!service.showGettingStarted">▹</span>
-      <span ng-if="service.showGettingStarted">▿</span>
-    </div>
-    <span>
-      Getting Started with <code>gcloud</code>
-    </span>
-  </h3>
-  <article
-    ng-if="service.showGettingStarted"
-    ng-include="docs.overview"></article>
-  <hr />
+  <div ng-if="docs.overviewFileUrl">
+    <h3 class="sub-heading toggle" ng-click="service.showGettingStarted = !service.showGettingStarted">
+      <div class="toggler">
+        <span ng-if="!service.showGettingStarted">▹</span>
+        <span ng-if="service.showGettingStarted">▿</span>
+      </div>
+      <span>
+        Getting Started with <code>gcloud</code>
+      </span>
+    </h3>
+    <article
+      ng-show="service.showGettingStarted"
+      ng-include="docs.overviewFileUrl"></article>
+    <hr />
+  </div>
   <article ng-if="service.metadata.description">
     <h3>{{::service.metadata.name}} Overview</h3>
     <div bind-html-compile="service.metadata.description"></div>
