@@ -19,6 +19,14 @@
   <article ng-if="service.metadata.description">
     <h3>{{::service.metadata.name}} Overview</h3>
     <div bind-html-compile="service.metadata.description"></div>
+    <section ng-if="service.metadata.resources.length">
+      <h4>More Information</h4>
+      <ul class="resource-links">
+        <li ng-repeat="resource in service.metadata.resources">
+          <a ng-href="{{resource.link}}">{{resource.title}}</a>
+        </li>
+      </ul>
+    </section>
   </article>
   <article ng-repeat="method in service.methods">
     <h2 ng-if="method.metadata.isConstructor">{{::method.metadata.name}}</h2>
