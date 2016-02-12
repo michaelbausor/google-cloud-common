@@ -6,7 +6,7 @@
     .config(homeRoutes);
 
   /** @ngInject */
-  function homeRoutes(manifest, $stateProvider, $urlRouterProvider) {
+  function homeRoutes(manifest, $stateProvider) {
     $stateProvider.state('home', {
       url: '/',
       templateUrl: 'app/home/home.html',
@@ -14,8 +14,6 @@
       controllerAs: 'home',
       resolve: { latestRelease: getLatestRelease }
     });
-
-    $urlRouterProvider.otherwise('/');
   }
 
   /** @ngInject */
