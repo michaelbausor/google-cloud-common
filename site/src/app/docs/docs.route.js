@@ -59,14 +59,21 @@
     $urlRouterProvider.when('/docs', goToGcloud);
 
     $urlRouterProvider.otherwise(function($injector, $location) {
-      var baseUrl = '/docs/';
+      var path = $location.path();
+      var docsBaseUrl = '/docs/';
+      var isUnknownRoute = path.indexOf(docsBaseUrl) === -1;
+
+      if (isUnknownRoute) {
+        return '/';
+      }
+
       var versions = $injector.get('manifest').versions;
-      var params = $location.path().replace(baseUrl, '').split('/');
+      var params = path.replace(docsBaseUrl, '').split('/');
       var isValidVersion = versions.indexOf(params[0]) !== -1;
 
       // could be a bad service name
       if (isValidVersion) {
-        return baseUrl + params[0];
+        return docsBaseUrl + params[0];
       }
 
       // could be a version alias
@@ -77,7 +84,7 @@
         params.unshift(latestVersion);
       }
 
-      return baseUrl + params.join('/');
+      return docsBaseUrl + params.join('/');
     });
   }
 
