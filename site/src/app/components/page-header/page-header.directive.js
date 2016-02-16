@@ -6,7 +6,8 @@
     .directive('pageHeader', pageHeader);
 
   var templates = {
-    node: '{{title ? title.join(" » ") : "Node.js"}}'
+    node: '{{title ? title.join(" » ") : "Node.js"}}',
+    ruby: '{{title ? title.join("::") : "Ruby"}}'
   };
 
   /** @ngInject */
