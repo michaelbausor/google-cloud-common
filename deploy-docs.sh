@@ -19,6 +19,10 @@ set -ev
 # This script takes the doc contents that exist under the `src` directory and
 # pushes them to a the `src` directory in the gh-pages branch of the target
 # repos (gcloud-node, gcloud-php, etc...)
+cd site
+npm install
+gulp lint
+
 
 # Only execute this script if this is a push to master.
 if [ "${TRAVIS_BRANCH}" != "master" ] || [ "${TRAVIS_PULL_REQUEST}" != "false" ]
@@ -27,8 +31,6 @@ fi
 
 function deploy_docs {
   # Install dependencies & run the build (minify, concatenate dependencies, etc.)
-  cd site
-  npm install
   bower install
   gulp build
 
