@@ -119,25 +119,33 @@
   /** @ngInject */
   function getService($state, $stateParams, $interpolate, $http, manifest, util) {
     var ids = $stateParams.serviceId.split('/');
-    var serviceId = ids[0];
-    var pageId = ids[1];
+    var serviceId = ids.shift();
+    var pageId = ids.join('/');
     var service = util.findWhere(manifest.services, { id: serviceId });
     var pageTitle = service && service.title ? [service.title] : null;
+    var resource = service.contents;
 
     if (service && pageId) {
-      service = util.findWhere(service.nav, { id: pageId });
-      pageTitle.push(service.title);
+      var page = util.findWhere(service.nav, { id: pageId });
+      if (page) {
+        resource = page.contents;
+        pageTitle.push(page.title);
+      } else {
+        resource = $stateParams.serviceId + '.json';
+      }
     }
 
-    var json = $interpolate('{{content}}/{{version}}/{{data}}')({
+    var json = $interpolate('{{content}}/{{version}}/{{resource}}')({
       content: manifest.content,
       version: $stateParams.version,
-      data: service.contents
+      resource: resource
     });
 
     return $http.get(json).then(function(response) {
       var data = response.data;
-      data.metadata.title = pageTitle;
+      if (typeof data.metadata.title === 'undefined') {
+        data.metadata.title = pageTitle;
+      }
       return data;
     });
   }
