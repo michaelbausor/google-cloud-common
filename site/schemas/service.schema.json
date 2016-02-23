@@ -1,0 +1,253 @@
+{
+  "id": "service",
+  "type": "object",
+  "properties": {
+    "id": {
+      "id": "id",
+      "type": "string",
+      "description": "Service id"
+    },
+    "metadata": {
+      "id": "metadata",
+      "type": "object",
+      "description": "Misc. information relating to the service",
+      "properties": {
+        "name": {
+          "id": "name",
+          "type": "string",
+          "description": "User friendly name of the service"
+        },
+        "description": {
+          "id": "description",
+          "type": "string",
+          "description": "Brief overview of the service"
+        },
+        "resources": {
+          "id": "resources",
+          "type": "array",
+          "description": "List of links that relate to the service",
+          "items": {
+            "id": "resource",
+            "type": "object",
+            "description": "Object that describes a resource",
+            "properties": {
+              "title": {
+                "id": "title",
+                "type": "string",
+                "description": "User friendly text describing the resource"
+              },
+              "link": {
+                "id": "link",
+                "type": "string",
+                "description": "URL for the resource"
+              }
+            },
+            "required": [
+              "title",
+              "link"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "methods": {
+      "id": "methods",
+      "type": "array",
+      "description": "List of available methods for this service",
+      "items": {
+        "id": "method",
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "id": "metadata",
+            "type": "object",
+            "description": "Misc. information relating to the method",
+            "properties": {
+              "constructor": {
+                "id": "constructor",
+                "type": "boolean",
+                "description": "Signifies whether or not this method is a constructor (constructors are treated the same as methods)"
+              },
+              "name": {
+                "id": "name",
+                "type": "string",
+                "description": "The name of the method"
+              },
+              "source": {
+                "id": "source",
+                "type": "string",
+                "description": "Relative path to the source file of the method, including the line number"
+              },
+              "description": {
+                "id": "description",
+                "type": "string",
+                "description": "Brief overview of the method"
+              },
+              "examples": {
+                "id": "examples",
+                "type": "array",
+                "description": "List of examples showing how the method is used",
+                "items": {
+                  "id": "example",
+                  "type": "object",
+                  "description": "Object describing an example",
+                  "properties": {
+                    "caption": {
+                      "id": "caption",
+                      "type": "string",
+                      "description": "Caption explaining what the example is attempting to accomplish"
+                    },
+                    "code": {
+                      "id": "code",
+                      "type": "string",
+                      "description": "Code snippet showing how the method can be used"
+                    }
+                  }
+                }
+              },
+              "resources": {
+                "id": "resources",
+                "type": "array",
+                "description": "List of links relating to the method",
+                "items": {
+                  "id": "resource",
+                  "type": "object",
+                  "description": "Object describing the resource",
+                  "properties": {
+                    "title": {
+                      "id": "title",
+                      "type": "string",
+                      "description": "The resource title text"
+                    },
+                    "link": {
+                      "id": "link",
+                      "type": "string",
+                      "description": "The resource link URL"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "link"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "name",
+              "source"
+            ]
+          },
+          "params": {
+            "id": "params",
+            "type": "array",
+            "description": "List of parameters the method will accept",
+            "items": {
+              "id": "param",
+              "type": "object",
+              "description": "Object describing the parameter",
+              "properties": {
+                "name": {
+                  "id": "name",
+                  "type": "string",
+                  "description": "The name of the parameter"
+                },
+                "description": {
+                  "id": "description",
+                  "type": "string",
+                  "description": "The description of the parameter"
+                },
+                "types": {
+                  "id": "types",
+                  "type": "array",
+                  "description": "A list of different types that can be passed in for this parameter",
+                  "items": {
+                    "id": "type",
+                    "type": "string",
+                    "description": "The data type name, e.g. String, Number, etc."
+                  }
+                },
+                "optional": {
+                  "id": "optional",
+                  "type": "boolean",
+                  "description": "Signifies if this parameter is optional"
+                },
+                "nullable": {
+                  "id": "nullable",
+                  "type": "boolean",
+                  "description": "Signifies if this parameter can be null/nill"
+                }
+              },
+              "required": [
+                "name",
+                "types",
+                "optional",
+                "nullable"
+              ]
+            }
+          },
+          "exceptions": {
+            "id": "exceptions",
+            "type": "array",
+            "description": "A list of possible exceptions the method can throw",
+            "items": {
+              "id": "exception",
+              "type": "object",
+              "description": "Object describing the exception",
+              "properties": {
+                "type": {
+                  "id": "type",
+                  "type": "string",
+                  "description": "The error type, e.g. ApiError, BackendError, etc."
+                },
+                "description": {
+                  "id": "description",
+                  "type": "string",
+                  "description": "A description of why/when this error would be thrown"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          },
+          "returns": {
+            "id": "returns",
+            "type": "array",
+            "description": "A list of possible types that can be returned from the method",
+            "items": {
+              "id": "return",
+              "type": "object",
+              "description": "Object describing the return value",
+              "properties": {
+                "type": {
+                  "id": "type",
+                  "type": "string",
+                  "description": "The return value type, e.g. String, Number, etc."
+                },
+                "description": {
+                  "id": "description",
+                  "type": "string",
+                  "description": "A description of the return value"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "metadata"
+        ]
+      }
+    }
+  },
+  "required": [
+    "id",
+    "metadata",
+    "methods"
+  ]
+}
