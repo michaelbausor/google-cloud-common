@@ -9,7 +9,7 @@
   function GuideCtrl($scope, $state, $sce, $interpolate, guideObject, manifest, DeeplinkService, util) {
     var guide = this;
 
-    guide.title = [guideObject.title];
+    guide.title = guideObject.title;
     guide.contents = util.arrify(guideObject.contents).map(trustContent);
     guide.editUrl = guideObject.edit ? trustContent(guideObject.edit) : null;
 

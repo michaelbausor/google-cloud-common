@@ -9,16 +9,19 @@
   function ServiceCtrl($scope, $state, DeeplinkService, DocsService, serviceObject) {
     var service = this;
 
-    service.methods = serviceObject.methods.map(DocsService.setAsTrusted).sort(sortMethods);
-    service.metadata = DocsService.setAsTrusted(serviceObject || {}).metadata;
+    angular.extend(service, DocsService.setAsTrusted(serviceObject));
+
+    service.methods = serviceObject.methods
+      .map(DocsService.setAsTrusted)
+      .sort(sortMethods);
+
     service.methodNames = service.methods.map(getName);
-    service.title = serviceObject.metadata.title;
     service.showGettingStarted = false;
 
     $scope.$on('$viewContentLoaded', watchMethod);
 
     function getName(method) {
-      return method.metadata.name;
+      return method.name;
     }
 
     function watchMethod() {
@@ -30,18 +33,15 @@
     }
 
     function sortMethods(a, b) {
-      if (a.metadata.constructor) {
+      if (a.type === 'constructor') {
         return -1;
       }
 
-      if (b.metadata.constructor) {
+      if (b.type === 'constructor') {
         return 1;
       }
 
-      var aName = a.metadata.name;
-      var bName = b.metadata.name;
-
-      return +(aName > bName) || +(aName === bName) - 1;
+      return +(a.name > b.name) || +(a.name === b.name) - 1;
     }
   }
 }());

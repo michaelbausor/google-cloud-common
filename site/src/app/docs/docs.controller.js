@@ -1,4 +1,3 @@
-/* global semver:true */
 (function() {
   'use strict';
 
@@ -7,14 +6,13 @@
     .controller('DocsCtrl', DocsCtrl);
 
   /** @ngInject */
-  function DocsCtrl($state, langs, manifest, lastBuiltDate) {
+  function DocsCtrl($state, langs, manifest, toc, lastBuiltDate) {
     var docs = this;
 
     docs.langs = langs;
     docs.lastBuiltDate = lastBuiltDate;
-    docs.guides = angular.copy(manifest.guides).filter(isAvailable);
-    docs.services = angular.copy(manifest.services).filter(isAvailable);
-    docs.services.forEach(updateNav);
+    docs.guides = toc.guides;
+    docs.services = toc.services;
     docs.version = $state.params.version;
     docs.overviewFileUrl = null;
 
@@ -23,11 +21,11 @@
     docs.getGuideUrl = getGuideUrl;
     docs.isActive = isActive;
 
-    if (manifest.overview) {
+    if (toc.overview) {
       docs.overviewFileUrl = [
         manifest.content,
         $state.params.version,
-        manifest.overview
+        toc.overview
       ].join('/');
     }
 
@@ -41,22 +39,6 @@
 
     function getGuideUrl(page) {
       return page.title.toLowerCase().replace(/\s/g, '-');
-    }
-
-    function isAvailable(service) {
-      var version = $state.params.version;
-
-      if (version === 'master') {
-        return true;
-      }
-
-      return semver.satisfies(version, service.implemented || '*');
-    }
-
-    function updateNav(service) {
-      if (service.nav) {
-        service.nav = service.nav.filter(isAvailable);
-      }
     }
   }
 }());

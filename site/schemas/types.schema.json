@@ -1,0 +1,31 @@
+{
+  "id": "types",
+  "type": "array",
+  "description": "List of custom data types available within this version",
+  "items": {
+    "id": "type",
+    "type": "object",
+    "description": "Object describing the data type",
+    "properties": {
+      "id": {
+        "id": "id",
+        "type": "string",
+        "description": "ID used to map custom types to JSON content"
+      },
+      "title": {
+        "id": "title",
+        "type": "string",
+        "description": "Name of the datatype as it should appear in the overview"
+      },
+      "contents": {
+        "id": "contents",
+        "type": "string",
+        "description": "Path to datatype JSON content"
+      }
+    },
+    "required": [
+      "id",
+      "contents"
+    ]
+  }
+}
