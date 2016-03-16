@@ -31,7 +31,9 @@
         controller: 'DocsCtrl',
         controllerAs: 'docs',
         resolve: {
-          lastBuiltDate: getLastBuiltDate
+          lastBuiltDate: getLastBuiltDate,
+          toc: getToc,
+          types: getTypes
         },
         params: {
           version: latestVersion
@@ -105,47 +107,65 @@
   }
 
   /** @ngInject */
-  function getGuide($state, $stateParams, util, manifest) {
+  function getToc($interpolate, $http, $stateParams, manifest) {
+    var tocUrl = $interpolate('{{content}}/{{version}}/toc.json')({
+      content: manifest.content,
+      version: $stateParams.version
+    });
+
+    return $http.get(tocUrl).then(function(response) {
+      return response.data;
+    });
+  }
+
+  /** @ngInject */
+  function getTypes($interpolate, $http, $stateParams, manifest) {
+    var typeUrl = $interpolate('{{content}}/{{version}}/types.json')({
+      content: manifest.content,
+      version: $stateParams.version
+    });
+
+    return $http.get(typeUrl).then(function(response) {
+      return response.data;
+    });
+  }
+
+  /** @ngInject */
+  function getGuide($q, $stateParams, util, toc) {
     var guideId = $stateParams.guideId.replace(/\-/g, ' ');
-    var guide = util.findWhere(manifest.guides, { id: guideId });
+    var guide = util.findWhere(toc.guides, { id: guideId });
 
     if (!guide) {
-      return $state.go('docs.service');
+      return $q.reject('Unknown guide: ' + guideId);
     }
 
     return guide;
   }
 
   /** @ngInject */
-  function getService($state, $stateParams, $interpolate, $http, manifest, util) {
-    var ids = $stateParams.serviceId.split('/');
-    var serviceId = ids.shift();
-    var pageId = ids.join('/');
-    var service = util.findWhere(manifest.services, { id: serviceId });
-    var pageTitle = service && service.title ? [service.title] : null;
-    var resource = service.contents;
+  function getService($stateParams, $interpolate, $http, $q, manifest, types, util) {
+    var serviceId = $stateParams.serviceId;
+    var service = util.findWhere(types, {
+      id: serviceId
+    });
 
-    if (service && pageId) {
-      var page = util.findWhere(service.nav, { id: pageId });
-      if (page) {
-        resource = page.contents;
-        pageTitle.push(page.title);
-      } else {
-        resource = $stateParams.serviceId + '.json';
-      }
+    if (!service) {
+      return $q.reject('Unknown service: ' + serviceId);
     }
 
     var json = $interpolate('{{content}}/{{version}}/{{resource}}')({
       content: manifest.content,
       version: $stateParams.version,
-      resource: resource
+      resource: service.contents
     });
 
     return $http.get(json).then(function(response) {
       var data = response.data;
-      if (typeof data.metadata.title === 'undefined') {
-        data.metadata.title = pageTitle;
+
+      if (service.title) {
+        data.title = service.title;
       }
+
       return data;
     });
   }
@@ -153,7 +173,7 @@
   /** @ngInject */
   function goToGcloud($state, $stateParams) {
     $state.go('docs.service', {
-      version: $stateParams.version,
+      version: $stateParams.version || 'latest',
       serviceId: 'gcloud'
     });
   }

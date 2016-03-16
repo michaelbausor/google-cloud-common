@@ -11,13 +11,14 @@
     function setAsTrusted(_method) {
       var method = angular.copy(_method);
 
-      if (method.metadata) {
-        method.metadata.description = $sce.trustAsHtml(method.metadata.description);
-        method.metadata.isConstructor = method.metadata.constructor === true;
+      method.isConstructor = method.type === 'constructor';
 
-        if (method.metadata.examples) {
-          method.metadata.examples = method.metadata.examples.map(trustExample);
-        }
+      if (method.description) {
+        method.description = $sce.trustAsHtml(method.description);
+      }
+
+      if (method.examples) {
+        method.examples = method.examples.map(trustExample);
       }
 
       if (method.returns) {
@@ -68,7 +69,8 @@
     }
 
     return {
-      setAsTrusted: setAsTrusted
+      setAsTrusted: setAsTrusted,
+      trust: $sce.trustAsHtml.bind($sce)
     };
   }
 

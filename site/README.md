@@ -12,19 +12,22 @@
   * [`versions`][versions-key]
   * [`content`][content-key]
   * [`home`][home-key]
+  * [`package`][package-key]
+* [Table of Contents][toc]
   * [`overview`][overview-key]
   * [`guides`][guides-key]
   * [`services`][services-key]
-  * [`package`][package-key]
+* [Types][types]
+  * [`types`][types-key]
 * [JSON Docs Schema][json-schema]
   * [`id`][id-key]
   * [`description` and `caption`][description-keys]
-  * [`metadata`][metadata-key]
+  * [Misc. keys][misc-keys]
   * [`methods`][methods-key]
-    * [`metadata`][metadata-key-1]
     * [`params`][params-key]
     * [`exceptions`][exceptions-key]
     * [`returns`][returns-key]
+    * [Misc. keys][misc-keys-1]
   * [Custom Data Types][custom-types]
 * [Misc. Content][misc-content]
   * [Landing Page][landing-page]
@@ -74,6 +77,8 @@ gcloud-common/site/src
  ├─── assets # images, etc.
  ├─── versions # JSON content folder
  |     └─── v0.28.0 # one folder per release
+ |           ├─── toc.json # table of contents for this version
+ |           ├─── types.json # list of custom types for this version
  |           └─── storage # one folder per service
  |                 ├─── index.json # one file per class/module/etc.
  |                 └─── bucket.json
@@ -163,6 +168,27 @@ For the landing page of the documentation, it was decided (*see [gcloud-common#4
 
 See the [Landing Page section][landing-page] for more information.
 
+##### `package` key
+
+This allows you to specify what package manager you use and a direct link to your package.
+
+```js
+{
+  "package": {
+    "title": "npm",
+    "href": "https://www.npmjs.com/package/gcloud"
+  }
+}
+```
+
+See the [JSON Docs Schema section][json-schema] for more information.
+
+## Table of Contents
+
+The <kbd>toc.json</kbd> file is used to create the primary navigation component, it also maps JSON content to custom data types that may not be accessible via main navigation.
+
+For each version folder you have, there should be a corresponding <kbd>toc.json</kbd> file located within said folder.
+
 ##### `overview` key
 
 **Note:** *This field is completely optional.*
@@ -203,40 +229,46 @@ Optionally you can also provide an `edit` field, which should map to a URL that 
 
 The services section is very similar to the [guides section][guides-key]. This key will act as a table of contents for the *API* section of the documentation site. Instead of markdown, this section of the docs is driven by [JSON][json-schema].
 
-Since there is only a single manifest for all versions (at least for now) you can add a key called `implemented` to specify what versions this service is available in.
+The `type` key should map to an object within the [`types`][types-key] array.
 
 You can also create nested sections for the various service concepts via `nav` key. The objects that occupy the `nav` array match that of the `service` array.
 
 ```js
 {
   "services": [{
-    "title": "title": "Storage",
-    "id": "storage",
-    "implemented": ">=0.10.0",
-    "contents": "storage/index.json",
+    "title": "Storage",
+    "type": "storage",
     "nav": [{
       "title": "Bucket",
-      "id": "bucket",
-      "contents": "storage/bucket.json"
+      "type": "storage/bucket"
     }]
   }]
 }
 ```
 
-##### `package` key
+## Types
 
-This allows you to specify what package manager you use and a direct link to your package.
+The types section lists all the available data types for the application. All types should be placed within the <kbd>types.json</kbd> file.
+
+##### `types` key
+
+The `id` key will be used to map content from urls - `/docs/v0.28.0/storage/bucket` will map to `"id": "storage/bucket"`
+
+The `title` key will be used to create a title on the service page.
 
 ```js
 {
-  "package": {
-    "title": "npm",
-    "href": "https://www.npmjs.com/package/gcloud"
-  }
+  "types": [{
+    "title": "Storage",
+    "id": "storage",
+    "contents": "storage/index.json"
+  }, {
+    "title": "Storage » Bucket",
+    "id": "storage/bucket",
+    "contents": "storage/bucket.json"
+  }]
 }
 ```
-
-See the [JSON Docs Schema section][json-schema] for more information.
 
 ## JSON Docs Schema
 
@@ -262,20 +294,18 @@ Throughout the JSON structure there will be several instances of the `descriptio
 }
 ```
 
-##### `metadata` key
+##### Misc. keys
 
-The top-level metadata object contains a friendly name for the service. Optionally you can provide a service description and external links.
+The top-level object contains a friendly name for the service. Optionally you can provide a service description and external links.
 
 ```js
 {
-  "metadata": {
-    "name": "Storage",
-    "description": "<p>Storage is cool!</p>", // optional
-    "resources": [{ // optional
-      "title": "Storage Overview",
-      "link": "https://storage-is-cool.com"
-    }]
-  }
+  "name": "Storage",
+  "description": "<p>Storage is cool!</p>", // optional
+  "resources": [{ // optional
+    "title": "Storage Overview",
+    "link": "https://storage-is-cool.com"
+  }]
 }
 ```
 
@@ -286,35 +316,9 @@ This field defines all the methods available for this service. Methods contain m
 ```js
 {
   "methods": [{
-    "metadata": {},
     "params": [],
     "exceptions": [],
     "returns": []
-  }]
-}
-```
-
-###### `metadata` key
-
-This field is similar to the top-level metadata field, however it can also include several other items to better describe a method (examples, source code, etc.)
-
-```js
-{
-  "methods": [{
-    "metadata": {
-      "constructor": false, // we document constructors/modules in the same fashion as methods
-      "name": "createBucket", // method name -> Storage#createBucket
-      "source": "/lib/storage/index.js#L270", // github path for deeplinking
-      "description": "<p>Create a bucket.</p>",
-      "examples": [{ // list of examples
-        "caption": "<p>Here's how you would create a bucket!</p>", // caption for example
-        "code": "storage.createBucket('new-bucket', callback);" // example code
-      }],
-      "resources": [{ // list of external resources
-        "title": "Buckets: insert API docs",
-        "link": "https://storage-is-cool.com/create-buckets/"
-      }]
-    }
   }]
 }
 ```
@@ -379,6 +383,30 @@ This field is optional, when present it should contain a list of return values.
 }
 ```
 
+###### Misc. keys
+
+This field is similar to the top-level metadata field, however it can also include several other items to better describe a method (examples, source code, etc.)
+
+```js
+{
+  "methods": [{
+    "type": "constructor", // we document constructors/modules in the same fashion as methods
+    "id": "storage#createBucket", // unique ID for method
+    "name": "createBucket", // method name -> Storage#createBucket
+    "source": "/lib/storage/index.js#L270", // github path for deeplinking
+    "description": "<p>Create a bucket.</p>",
+    "examples": [{ // list of examples
+      "caption": "<p>Here's how you would create a bucket!</p>", // caption for example
+      "code": "storage.createBucket('new-bucket', callback);" // example code
+    }],
+    "resources": [{ // list of external resources
+      "title": "Buckets: insert API docs",
+      "link": "https://storage-is-cool.com/create-buckets/"
+    }]
+  }]
+}
+```
+
 ### Custom Data Types
 
 In some cases you may need to link to custom data types, this can happen pretty much anywhere (descriptions, param types, return types, exception types, etc.). If this is functionality that you need, you can instead return an `<a>` tag using a custom data attribute `custom-type`.
@@ -421,22 +449,13 @@ See a living example of gcloud-node's home template [here][gcloud-node-home].
 
 ##### Overview Section
 
-Specify an overview using the <kbd>manifest.json</kbd>'s [`overview` key][overview-key].
+Specify an overview using the <kbd>toc.json</kbd>'s [`overview` key][overview-key].
 
 Overviews are completely optional, you can create one using html.
 
 See [gcloud-node docs][gcloud-node-docs] for a working demo. The contents of the overview file fill the *Getting Started with gcloud* section of the service pages.
 
 See a living example of gcloud-node's overview template [here][gcloud-node-overview].
-
-##### Custom Page Headers
-
-Different languages may wish for different formatting when it comes to page titles, when moving to the common-docs you can design a [template][page-header-template] to display the title how you wish.
-
-A `title` array containing the name hierarchy will be available for you.
-
-When visiting `/docs/latest/storage` the `title` array will resemble `['Storage']`.
-When visiting `/docs/latest/storage/bucket` the `title` array will resemble `['Storage', 'Bucket']`.
 
 ## Deploying
 
@@ -467,9 +486,9 @@ Please refer to gcloud-node's [`gh-pages` branch][gcloud-node-ghpages] for an ex
 [json-schema]: #json-docs-schema
 [id-key]: #id-key
 [description-keys]: #description-and-caption-keys
-[metadata-key]: #metadata-key
+[misc-keys]: #misc-keys
 [methods-key]: #methods-key
-[metadata-key-1]: #metadata-key-1
+[misc-keys-1]: #misc-keys-1
 [params-key]: #params-key
 [exceptions-key]: #exceptions-key
 [returns-key]: #returns-key
@@ -479,6 +498,9 @@ Please refer to gcloud-node's [`gh-pages` branch][gcloud-node-ghpages] for an ex
 [overview-section]: #overview-section
 [custom-page-headers]: #custom-page-headers
 [deploying]: #deploying
+[toc]: #table-of-contents
+[types]: #types
+[types-key]: #types-key
 
 [nodejs]: https://nodejs.org/en/
 [hljs]: https://highlightjs.org/

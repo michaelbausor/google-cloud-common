@@ -7,51 +7,41 @@
       "type": "string",
       "description": "Service id"
     },
-    "metadata": {
-      "id": "metadata",
-      "type": "object",
-      "description": "Misc. information relating to the service",
-      "properties": {
-        "name": {
-          "id": "name",
-          "type": "string",
-          "description": "User friendly name of the service"
-        },
-        "description": {
-          "id": "description",
-          "type": "string",
-          "description": "Brief overview of the service"
-        },
-        "resources": {
-          "id": "resources",
-          "type": "array",
-          "description": "List of links that relate to the service",
-          "items": {
-            "id": "resource",
-            "type": "object",
-            "description": "Object that describes a resource",
-            "properties": {
-              "title": {
-                "id": "title",
-                "type": "string",
-                "description": "User friendly text describing the resource"
-              },
-              "link": {
-                "id": "link",
-                "type": "string",
-                "description": "URL for the resource"
-              }
-            },
-            "required": [
-              "title",
-              "link"
-            ]
+    "name": {
+      "id": "name",
+      "type": "string",
+      "description": "User friendly name of the service"
+    },
+    "description": {
+      "id": "description",
+      "type": "string",
+      "description": "Brief overview of the service"
+    },
+    "resources": {
+      "id": "resources",
+      "type": "array",
+      "description": "List of links that relate to the service",
+      "items": {
+        "id": "resource",
+        "type": "object",
+        "description": "Object that describes a resource",
+        "properties": {
+          "title": {
+            "id": "title",
+            "type": "string",
+            "description": "User friendly text describing the resource"
+          },
+          "link": {
+            "id": "link",
+            "type": "string",
+            "description": "URL for the resource"
           }
-        }
-      },
-      "required": [
-        "name"
-      ]
+        },
+        "required": [
+          "title",
+          "link"
+        ]
+      }
     },
     "methods": {
       "id": "methods",
@@ -61,84 +51,78 @@
         "id": "method",
         "type": "object",
         "properties": {
-          "metadata": {
-            "id": "metadata",
-            "type": "object",
-            "description": "Misc. information relating to the method",
-            "properties": {
-              "constructor": {
-                "id": "constructor",
-                "type": "boolean",
-                "description": "Signifies whether or not this method is a constructor (constructors are treated the same as methods)"
-              },
-              "name": {
-                "id": "name",
-                "type": "string",
-                "description": "The name of the method"
-              },
-              "source": {
-                "id": "source",
-                "type": "string",
-                "description": "Relative path to the source file of the method, including the line number"
-              },
-              "description": {
-                "id": "description",
-                "type": "string",
-                "description": "Brief overview of the method"
-              },
-              "examples": {
-                "id": "examples",
-                "type": "array",
-                "description": "List of examples showing how the method is used",
-                "items": {
-                  "id": "example",
-                  "type": "object",
-                  "description": "Object describing an example",
-                  "properties": {
-                    "caption": {
-                      "id": "caption",
-                      "type": "string",
-                      "description": "Caption explaining what the example is attempting to accomplish"
-                    },
-                    "code": {
-                      "id": "code",
-                      "type": "string",
-                      "description": "Code snippet showing how the method can be used"
-                    }
-                  }
-                }
-              },
-              "resources": {
-                "id": "resources",
-                "type": "array",
-                "description": "List of links relating to the method",
-                "items": {
-                  "id": "resource",
-                  "type": "object",
-                  "description": "Object describing the resource",
-                  "properties": {
-                    "title": {
-                      "id": "title",
-                      "type": "string",
-                      "description": "The resource title text"
-                    },
-                    "link": {
-                      "id": "link",
-                      "type": "string",
-                      "description": "The resource link URL"
-                    }
-                  },
-                  "required": [
-                    "title",
-                    "link"
-                  ]
+          "id": {
+            "id": "id",
+            "type": "string",
+            "description": "Unique ID used to identify the method"
+          },
+          "type": {
+            "id": "type",
+            "type": "string",
+            "description": "Signifies what kind of method this is (static, instance, constructor)"
+          },
+          "name": {
+            "id": "name",
+            "type": "string",
+            "description": "The name of the method"
+          },
+          "source": {
+            "id": "source",
+            "type": "string",
+            "description": "Relative path to the source file of the method, including the line number"
+          },
+          "description": {
+            "id": "description",
+            "type": "string",
+            "description": "Brief overview of the method"
+          },
+          "examples": {
+            "id": "examples",
+            "type": "array",
+            "description": "List of examples showing how the method is used",
+            "items": {
+              "id": "example",
+              "type": "object",
+              "description": "Object describing an example",
+              "properties": {
+                "caption": {
+                  "id": "caption",
+                  "type": "string",
+                  "description": "Caption explaining what the example is attempting to accomplish"
+                },
+                "code": {
+                  "id": "code",
+                  "type": "string",
+                  "description": "Code snippet showing how the method can be used"
                 }
               }
-            },
-            "required": [
-              "name",
-              "source"
-            ]
+            }
+          },
+          "resources": {
+            "id": "resources",
+            "type": "array",
+            "description": "List of links relating to the method",
+            "items": {
+              "id": "resource",
+              "type": "object",
+              "description": "Object describing the resource",
+              "properties": {
+                "title": {
+                  "id": "title",
+                  "type": "string",
+                  "description": "The resource title text"
+                },
+                "link": {
+                  "id": "link",
+                  "type": "string",
+                  "description": "The resource link URL"
+                }
+              },
+              "required": [
+                "title",
+                "link"
+              ]
+            }
           },
           "params": {
             "id": "params",
@@ -222,10 +206,15 @@
               "type": "object",
               "description": "Object describing the return value",
               "properties": {
-                "type": {
-                  "id": "type",
-                  "type": "string",
-                  "description": "The return value type, e.g. String, Number, etc."
+                "types": {
+                  "id": "types",
+                  "type": "array",
+                  "description": "List of the possible return values",
+                  "items": {
+                    "id": "type",
+                    "type": "string",
+                    "description": "Name of the data type"
+                  }
                 },
                 "description": {
                   "id": "description",
@@ -234,20 +223,22 @@
                 }
               },
               "required": [
-                "type"
+                "types"
               ]
             }
           }
         },
         "required": [
-          "metadata"
+          "id",
+          "name",
+          "source"
         ]
       }
     }
   },
   "required": [
     "id",
-    "metadata",
+    "name",
     "methods"
   ]
 }

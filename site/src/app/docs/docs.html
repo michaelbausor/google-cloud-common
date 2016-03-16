@@ -32,10 +32,10 @@
         <h4 class="list-item--heading">API</h4>
       </li>
       <li ng-repeat="service in docs.services">
-        <a side-nav-link="/{{service.id}}">{{service.title || service.id}}</a>
-        <ul class="sub-sections" ng-if="service.nav && docs.isActive(service.id)">
+        <a side-nav-link="/{{service.type}}">{{service.title || service.type}}</a>
+        <ul class="sub-sections" ng-if="service.nav && docs.isActive(service.type)">
           <li ng-repeat="page in service.nav">
-            <a side-nav-link="/{{service.id}}/{{page.id}}">{{page.title || page.id}}</a>
+            <a side-nav-link="/{{page.type}}">{{page.title || page.type}}</a>
           </li>
         </ul>
       </li>
