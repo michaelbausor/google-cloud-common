@@ -13,6 +13,7 @@
   * [`content`][content-key]
   * [`home`][home-key]
   * [`package`][package-key]
+  * [`methodTypeSymbols`][methodtypesymbols-key]
 * [Table of Contents][toc]
   * [`overview`][overview-key]
   * [`guides`][guides-key]
@@ -178,6 +179,25 @@ This allows you to specify what package manager you use and a direct link to you
     "title": "npm",
     "href": "https://www.npmjs.com/package/gcloud"
   }
+}
+```
+
+##### `methodTypeSymbols` key
+
+This optional list allows you to map language-specific method type names (such as `instance` or `static`) to labels or symbols displayed in the method listing (such as `#`.) If not provided, the pound sign (`#`) will be used for all method types.
+
+```js
+{
+  "methodTypeSymbols": [
+    {
+      "type": "class",
+      "symbol": "::"
+    },
+    {
+      "type": "instance",
+      "symbol": "#"
+    }
+  ]
 }
 ```
 

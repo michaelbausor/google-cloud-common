@@ -32,7 +32,7 @@
     <h2 ng-if="method.isConstructor">{{::method.name}}</h2>
     <h3 id="{{::method.name}}" ng-if="!method.isConstructor" class="method-heading">
       <a class="permalink" ui-sref="docs.service({ method: method.name })">
-        <span>#</span>
+        <span>{{::method.typeSymbol}}</span>
         {{::method.name}}
       </a>
     </h3>
