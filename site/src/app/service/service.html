@@ -30,8 +30,8 @@
   </article>
   <article ng-repeat="method in service.methods">
     <h2 ng-if="method.isConstructor">{{::method.name}}</h2>
-    <h3 id="{{::method.name}}" ng-if="!method.isConstructor" class="method-heading">
-      <a class="permalink" ui-sref="docs.service({ method: method.name })">
+    <h3 id="{{::method.id}}" ng-if="!method.isConstructor" class="method-heading">
+      <a class="permalink" ui-sref="docs.service({ serviceId: method.id })">
         <span>{{::method.typeSymbol}}</span>
         {{::method.name}}
       </a>
@@ -40,7 +40,7 @@
     <div ng-if="method.isConstructor" class="notice">
       Available methods:
       <span ng-repeat="method in service.methods">
-        <a ui-sref="docs.service({ method: method.name })">{{method.name}}</a>{{$last ? '' : ', '}}
+        <a ui-sref="docs.service({ serviceId: method.id })">{{method.name}}</a>{{$last ? '' : ', '}}
       </span>
     </div>
     <section ng-if="method.params.length">
