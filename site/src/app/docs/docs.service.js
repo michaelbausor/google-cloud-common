@@ -7,11 +7,13 @@
     .factory('DocsService', DocsService);
 
   /** @ngInject */
-  function DocsService($sce, manifest) {
+  function DocsService($sce, manifest, util) {
     function setAsTrusted(_method) {
       var method = angular.copy(_method);
 
       method.isConstructor = method.type === 'constructor';
+
+      method.typeSymbol = getTypeSymbol(method.type);
 
       if (method.description) {
         method.description = $sce.trustAsHtml(method.description);
@@ -30,6 +32,19 @@
       }
 
       return method;
+    }
+
+    function getTypeSymbol(methodType) {
+      var typeSymbol = '#';
+      if (methodType && manifest.methodTypeSymbols) {
+        var mapping = util.findWhere(manifest.methodTypeSymbols, {
+          type: methodType
+        });
+        if (mapping) {
+          typeSymbol = mapping.symbol;
+        }
+      }
+      return typeSymbol;
     }
 
     function trustReturn(returnValue) {

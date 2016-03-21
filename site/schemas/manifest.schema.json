@@ -57,6 +57,32 @@
         "title",
         "href"
       ]
+    },
+    "methodTypeSymbols": {
+      "id": "methodTypeSymbols",
+      "type": "array",
+      "description": "List of mappings from method types to display symbols",
+      "items": {
+        "id": "methodTypeSymbol",
+        "type": "object",
+        "description": "Maps a method type ('instance') to a symbol ('#')",
+        "properties": {
+          "type": {
+            "id": "type",
+            "type": "string",
+            "description": "The language-specific type name of the method"
+          },
+          "symbol": {
+            "id": "symbol",
+            "type": "string",
+            "description": "The language-specific symbol for the method type"
+          }
+        },
+        "required": [
+          "type",
+          "symbol"
+        ]
+      }
     }
   },
   "required": [
