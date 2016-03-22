@@ -521,6 +521,7 @@ Please refer to gcloud-node's [`gh-pages` branch][gcloud-node-ghpages] for an ex
 [toc]: #table-of-contents
 [types]: #types
 [types-key]: #types-key
+[methodtypesymbols-key]: #methodtypesymbols-key
 
 [nodejs]: https://nodejs.org/en/
 [hljs]: https://highlightjs.org/
