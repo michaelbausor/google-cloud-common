@@ -25,9 +25,7 @@
         }
 
         function toggleClass(currentHref) {
-          // Strip any method "anchor" that may follow the serviceId, and
-          // prepend '#' to match href.
-          currentHref = '#' + currentHref.replace(/[#\.].+$/, '');
+          currentHref = '#' + currentHref;
 
           if (currentHref === href) {
             elem.addClass('current');

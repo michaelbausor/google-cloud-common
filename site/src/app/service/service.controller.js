@@ -25,16 +25,11 @@
     }
 
     function watchMethod() {
-      return DeeplinkService.watch($scope, getAnchor);
+      return DeeplinkService.watch($scope, getMethod);
     }
 
-    function getAnchor() {
-      var serviceId = $state.params && $state.params.serviceId;
-      // Only return anchor if serviceId is for a method in the service, not the
-      // service itself). If so, the method's id will be an anchor in the page.
-      if (serviceId !== service.id) {
-        return serviceId;
-      }
+    function getMethod() {
+      return $state.params && $state.params.method;
     }
 
     function sortMethods(a, b) {
