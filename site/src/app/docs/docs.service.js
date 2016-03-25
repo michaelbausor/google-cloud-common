@@ -1,4 +1,3 @@
-/* global hljs:true */
 (function() {
   'use strict';
 
@@ -55,8 +54,7 @@
       var code, caption;
 
       if (example.code) {
-        code = hljs.highlight(manifest.markdown, example.code);
-        code = $sce.trustAsHtml(code.value);
+        code = $sce.trustAsHtml(example.code);
       }
 
       if (example.caption) {

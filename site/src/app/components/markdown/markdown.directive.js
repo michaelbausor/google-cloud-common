@@ -1,4 +1,3 @@
-/* global hljs: true */
 (function() {
   'use strict';
 
@@ -7,20 +6,20 @@
     .directive('markdown', markdown);
 
   /** @ngInject */
-  function markdown(markdownConverter) {
+  function markdown($compile, markdownConverter) {
     return {
       restrict: 'E',
       link: function(scope, elem) {
-        var html = markdownConverter.makeHtml(elem.text());
-        var node = angular.element(html);
+        var unwatch = scope.$on('$includeContentLoaded', compile);
 
-        [].slice.call(node.find('code')).filter(function(code) {
-          return code.parentNode.tagName.toLowerCase() === 'pre';
-        }).forEach(function(code) {
-          hljs.highlightBlock(code);
-        });
+        function compile() {
+          var html = markdownConverter.makeHtml(elem.text());
+          var node = angular.element(html);
 
-        elem.html('').append(node);
+          elem.html('').append(node);
+          $compile(elem.contents())(scope);
+          unwatch();
+        }
       }
     };
   }
