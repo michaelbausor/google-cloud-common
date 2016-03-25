@@ -1,8 +1,10 @@
+/* global hljs: true */
 (function() {
   'use strict';
 
   angular
     .module('gcloud')
+    .constant('hljs', hljs)
     .constant('langs', [{
       friendly: 'Java',
       key: 'java'
