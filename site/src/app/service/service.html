@@ -70,7 +70,7 @@
       <div ng-repeat="example in method.examples">
         <div ng-if="example.caption" bind-html-compile="example.caption"></div>
         <div ng-if="example.code" class="code-block">
-          <pre><code class="hljs" bind-html-compile="example.code"></code></pre>
+          <pre><code class="hljs {{::markdown}}" bind-html-compile="example.code"></code></pre>
         </div>
       </div>
     </section>
