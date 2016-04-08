@@ -83,7 +83,7 @@
         params[0] = latestVersion;
       } else {
         // otherwise let's assume the version was omitted entirely
-        params.unshift(latestVersion);
+        params.unshift($injector.get('$stateParams').version || latestVersion);
       }
 
       return docsBaseUrl + params.join('/');
