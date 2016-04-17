@@ -30,6 +30,7 @@
         templateUrl: 'app/docs/docs.html',
         controller: 'DocsCtrl',
         controllerAs: 'docs',
+        abstract: true,
         resolve: {
           lastBuiltDate: getLastBuiltDate,
           toc: getToc,
@@ -37,8 +38,7 @@
         },
         params: {
           version: latestVersion
-        },
-        redirectTo: 'docs.service'
+        }
       })
       .state('docs.guides', {
         url: '/guides/:guideId?section',
@@ -53,12 +53,11 @@
         controller: 'ServiceCtrl',
         controllerAs: 'service',
         resolve: { serviceObject: getService },
-        params: {
-          serviceId: 'gcloud'
-        }
+        params: { serviceId: 'gcloud' }
       });
 
-    $urlRouterProvider.when('/docs', goToGcloud);
+    $urlRouterProvider.when('/docs', '/docs/latest');
+    $urlRouterProvider.when('/docs/:version', '/docs/:version/gcloud');
 
     $urlRouterProvider.otherwise(function($injector, $location) {
       var path = $location.path();
@@ -167,14 +166,6 @@
       }
 
       return data;
-    });
-  }
-
-  /** @ngInject */
-  function goToGcloud($state, $stateParams) {
-    $state.go('docs.service', {
-      version: $stateParams.version || 'latest',
-      serviceId: 'gcloud'
     });
   }
 
