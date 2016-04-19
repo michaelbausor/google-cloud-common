@@ -9,6 +9,7 @@
   function docsRoutes($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider, manifest) {
     // source: https://github.com/sindresorhus/semver-regex
     var regSemver = '\\bv?(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-[\\da-z\-]+(?:\\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?\\b';
+    var baseVersionUrl = '/docs/{version:master|' + regSemver + '}';
     var latestVersion = manifest.versions[0];
 
     $urlMatcherFactoryProvider.type('nonURIEncoded', {
@@ -26,7 +27,7 @@
         // then we'll end up in the $urlRouterProvier.otherwise(...) block
         // which will look for version alias's or the absense of a version
         // and redirect the user appropriately
-        url: '/docs/{version:master|' + regSemver + '}',
+        url: baseVersionUrl,
         templateUrl: 'app/docs/docs.html',
         controller: 'DocsCtrl',
         controllerAs: 'docs',
@@ -57,7 +58,7 @@
       });
 
     $urlRouterProvider.when('/docs', '/docs/latest');
-    $urlRouterProvider.when('/docs/:version', '/docs/:version/gcloud');
+    $urlRouterProvider.when(baseVersionUrl, '/docs/:version/gcloud');
 
     $urlRouterProvider.otherwise(function($injector, $location) {
       var path = $location.path();
