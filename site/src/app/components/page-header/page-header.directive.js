@@ -17,6 +17,10 @@
       },
       link: function(scope) {
         scope.title = scope.title || manifest.friendlyLang;
+
+        if (angular.isArray(scope.title)) {
+          scope.title = scope.title.join(manifest.titleDelimiter || ' » ');
+        }
       }
     };
   }

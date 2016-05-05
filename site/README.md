@@ -9,6 +9,7 @@
   * [`lang`][lang-key]
   * [`friendlyLang`][friendlylang-key]
   * [`markdown`][markdown-key]
+  * [`titleDelimiter`][delimiter-key]
   * [`versions`][versions-key]
   * [`content`][content-key]
   * [`home`][home-key]
@@ -126,6 +127,16 @@ The Angular app currently leverages a code highlighting library called [highligh
 ```js
 {
   "markdown": "javascript"
+}
+```
+
+##### `titleDelimiter` key
+
+*This key is completely optional*. Used for joining title strings together, if omitted the default value is `" » "`.
+
+```js
+{
+  "titleDelimiter": " » "
 }
 ```
 
@@ -274,7 +285,7 @@ The types section lists all the available data types for the application. All ty
 
 The `id` key will be used to map content from urls - `/docs/v0.28.0/storage/bucket` will map to `"id": "storage/bucket"`
 
-The `title` key will be used to create a title on the service page.
+The `title` key will be used to create a title on the service page. You can provide either a string or an array of strings that will be joined by a special character specified in the <kbd>manifest.json</kbd> via [`titleDelimiter`][delimiter-key].
 
 ```js
 {
@@ -283,7 +294,7 @@ The `title` key will be used to create a title on the service page.
     "id": "storage",
     "contents": "storage/index.json"
   }, {
-    "title": "Storage » Bucket",
+    "title": ["Storage", "Bucket"],
     "id": "storage/bucket",
     "contents": "storage/bucket.json"
   }]
@@ -496,6 +507,7 @@ Please refer to gcloud-node's [`gh-pages` branch][gcloud-node-ghpages] for an ex
 [lang-key]: #lang-key
 [friendlylang-key]: #friendlylang-key
 [markdown-key]: #markdown-key
+[delimiter-key]: #titledelimiter-key
 [versions-key]: #versions-key
 [content-key]: #content-key
 [home-key]: #home-key
