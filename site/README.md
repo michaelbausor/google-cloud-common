@@ -545,6 +545,6 @@ Please refer to gcloud-node's [`gh-pages` branch][gcloud-node-ghpages] for an ex
 [gcloud-node-overview]: https://github.com/GoogleCloudPlatform/gcloud-node/blob/gh-pages/json/v0.28.0/overview.html
 [gcloud-node-docs]: https://googlecloudplatform.github.io/gcloud-node/#/docs/latest/
 [gcloud-common-deploy]: https://github.com/GoogleCloudPlatform/gcloud-common/blob/master/deploy-docs.sh#L71
-[manifest-schema]: /site/schemas/manifest.json
-[json-schema]: /site/schemas/service.json
+[manifest-schema]: /site/schemas/manifest.schema.json
+[json-schema]: /site/schemas/service.schema.json
 [page-header-template]: https://github.com/GoogleCloudPlatform/gcloud-common/blob/master/site/src/app/components/page-header/page-header.directive.js#L8
