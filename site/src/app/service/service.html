@@ -16,7 +16,7 @@
       ng-include="docs.overviewFileUrl"></article>
     <hr />
   </div>
-  <article ng-if="service.description || service.resources.length">
+  <article ng-if="service.description || service.resources.length" class="description">
     <h3>{{::service.name}} Overview</h3>
     <div ng-if="service.description" bind-html-compile="service.description"></div>
     <section ng-if="service.resources.length">
