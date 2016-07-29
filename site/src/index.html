@@ -52,7 +52,9 @@
           .then(function(response) {
             angular
               .module('gcloud.manifest', [])
-              .constant('manifest', response.data);
+              .constant('manifest', angular.extend({
+                defaultPackage: ''
+              }, response.data));
 
             angular.element(document)
               .ready(function() {

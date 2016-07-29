@@ -5,7 +5,7 @@
       &nbsp;
       <select
         ng-model="docs.selectedVersion"
-        ng-options="version for version in versions"
+        ng-options="version for version in docs.versions"
         ng-change="docs.loadVersion(docs.selectedVersion)"
       ></select>
       <div ng-if="selectedVersion.name === 'master' && docs.lastBuiltDate">

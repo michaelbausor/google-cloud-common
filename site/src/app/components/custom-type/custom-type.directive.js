@@ -11,7 +11,8 @@
       var stateName = 'docs.service';
       var stateParams = {
         serviceId: customType,
-        version: $state.params.version
+        version: $state.params.version,
+        package: $state.params.package || ''
       };
       var stateOptions = { inherit: false };
 
