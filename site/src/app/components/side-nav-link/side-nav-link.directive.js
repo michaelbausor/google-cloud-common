@@ -7,13 +7,13 @@
 
   /** @ngInject */
   function sideNavLink($location, $state, $interpolate) {
-    var url = $interpolate('#/docs/{{package}}/{{version}}{{href}}');
+    var url = $interpolate('#/docs/{{module}}/{{version}}{{href}}');
 
     return {
       restrict: 'A',
       link: function(scope, elem, attrs) {
         var href = url({
-          package: $state.params.package || '',
+          module: $state.params.module || '',
           version: $state.params.version,
           href: attrs.sideNavLink
         }).replace('//', '/');

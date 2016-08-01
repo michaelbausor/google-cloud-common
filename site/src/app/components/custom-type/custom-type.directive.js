@@ -12,7 +12,7 @@
       var stateParams = {
         serviceId: customType,
         version: $state.params.version,
-        package: $state.params.package || ''
+        module: $state.params.module || ''
       };
       var stateOptions = { inherit: false };
 

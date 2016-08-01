@@ -6,20 +6,14 @@
     .directive('languageSwitcher', languageSwitcher);
 
   /** @ngInject */
-  function languageSwitcher() {
+  function languageSwitcher(langs, manifest) {
     return {
       restrict: 'A',
       templateUrl: 'app/components/language-switcher/language-switcher.html',
-      controller: LanguageSwitcherCtrl,
-      controllerAs: 'switcher',
-      bindToController: true
+      link: function(scope) {
+        scope.langs = langs;
+        scope.modules = manifest.modules;
+      }
     };
-  }
-
-  /** @ngInject */
-  function LanguageSwitcherCtrl(langs) {
-    var switcher = this;
-
-    switcher.langs = langs;
   }
 }());

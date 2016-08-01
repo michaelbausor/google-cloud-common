@@ -9,7 +9,7 @@
   function DocsCtrl($state, langs, manifest, toc, lastBuiltDate, versions) {
     var docs = this;
 
-    docs.libraryTitle = manifest.libraryTitle || 'gcloud';
+    docs.libraryTitle = manifest.libraryTitle || 'Google Cloud';
     docs.langs = langs;
     docs.lastBuiltDate = lastBuiltDate;
     docs.guides = toc.guides;
@@ -26,7 +26,7 @@
     if (toc.overview) {
       docs.overviewFileUrl = [
         manifest.content,
-        $state.params.package,
+        $state.params.module,
         $state.params.version,
         toc.overview
       ].join('/');

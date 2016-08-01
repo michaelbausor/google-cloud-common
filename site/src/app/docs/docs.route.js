@@ -13,7 +13,7 @@
 
     var baseUrl = [
       '/docs',
-      '{package:' + regPackage + '}',
+      '{module:' + regPackage + '}',
       '{version:master|' + regSemver + '}'
     ].join('/');
 
@@ -21,10 +21,10 @@
 
     if (manifest.versions) {
       latestCoreVersion = manifest.versions[0];
-    } else if (manifest.packages) {
-      latestCoreVersion = manifest.packages[0].latestVersion;
+    } else if (manifest.modules) {
+      latestCoreVersion = manifest.modules[0].latestVersion;
     } else {
-      throw new Error('Either "versions" or "packages" must be set.');
+      throw new Error('Either "versions" or "modules" must be set.');
     }
 
     $urlMatcherFactoryProvider.type('nonURIEncoded', {
@@ -55,7 +55,7 @@
         },
         params: {
           version: 'latest',
-          package: {
+          module: {
             value: null,
             squash: true
           }
@@ -82,19 +82,19 @@
 
     $urlRouterProvider.when('/docs', '/docs/latest');
 
-    // since /docs/:package/:version is an abstract state, it can't actually
+    // since /docs/:module/:version is an abstract state, it can't actually
     // be transitioned to. In the event a user tries to navigate to this
     // page, we'll find the default service for it and redirect the user there.
     $urlRouterProvider.when(baseUrl, function($match, $state, manifest, util) {
-      if (!manifest.packages) {
+      if (!manifest.modules) {
         return manifest.defaultService || 'gcloud';
       }
 
-      var pack = util.findWhere(manifest.packages, {
-        id: $match.package
+      var module = util.findWhere(manifest.modules, {
+        id: $match.module
       });
 
-      $match.serviceId = pack.defaultService;
+      $match.serviceId = module.defaultService;
 
       return $state.go('docs.service', $match);
     });
@@ -112,20 +112,20 @@
       }
 
       var params = path.replace(docsBaseUrl, '').split('/');
-      var pack;
+      var module;
 
-      if (manifest.packages) {
-        pack = $injector.get('util').findWhere(manifest.packages, {
+      if (manifest.modules) {
+        module = $injector.get('util').findWhere(manifest.modules, {
           id: params[0]
         });
       }
 
-      if (pack) {
+      if (module) {
         params.splice(0, 1);
-        docsBaseUrl += pack.id + '/';
+        docsBaseUrl += module.id + '/';
       }
 
-      var versions = pack ? pack.versions : manifest.versions;
+      var versions = module ? module.versions : manifest.versions;
 
       // if we can't confirm the version, let's just go to the home page..
       if (!versions) {
@@ -147,7 +147,7 @@
       if (version === 'latest' || version === 'stable') {
         params[0] = latestVersion;
       } else {
-        // otherwise lets assume the version was omitted altogether
+        // otherwise let's assume the version was omitted altogether
         params.unshift($injector.get('$stateParams').version || latestVersion);
       }
 
@@ -174,9 +174,9 @@
 
   /** @ngInject */
   function getToc($interpolate, $http, $stateParams, manifest) {
-    var tocUrl = $interpolate('{{content}}/{{package}}/{{version}}/toc.json')({
+    var tocUrl = $interpolate('{{content}}/{{module}}/{{version}}/toc.json')({
       content: manifest.content,
-      package: $stateParams.package || manifest.defaultPackage,
+      module: $stateParams.module || manifest.defaultPackage,
       version: $stateParams.version
     });
 
@@ -187,9 +187,9 @@
 
   /** @ngInject */
   function getTypes($interpolate, $http, $stateParams, manifest) {
-    var types = $interpolate('{{content}}/{{package}}/{{version}}/types.json')({
+    var types = $interpolate('{{content}}/{{module}}/{{version}}/types.json')({
       content: manifest.content,
-      package: $stateParams.package || manifest.defaultPackage,
+      module: $stateParams.module || manifest.defaultPackage,
       version: $stateParams.version
     });
 
@@ -222,15 +222,15 @@
       return $q.reject('Unknown service: ' + serviceId);
     }
 
-    var packageName = $stateParams.package || '';
+    var moduleName = $stateParams.module || '';
 
     // for modular docs the resource would be something simple like "job.json"
     // where as for non-modular it would be "bigquery/job.json"
-    var json = $interpolate('{{content}}/{{package}}/{{version}}/{{json}}')({
+    var json = $interpolate('{{content}}/{{module}}/{{version}}/{{json}}')({
       content: manifest.content,
       version: $stateParams.version,
       json: service.contents,
-      package: packageName
+      module: moduleName
     });
 
     return $http.get(json).then(function(response) {
@@ -246,7 +246,7 @@
 
   /** @ngInject */
   function getVersions(manifest, $stateParams, util, $q) {
-    if (!manifest.packages) {
+    if (!manifest.modules) {
       if (manifest.versions) {
         return manifest.versions;
       }
@@ -254,16 +254,16 @@
       return $q.reject('"versions" field missing from manifest.json');
     }
 
-    var packageName = $stateParams.package;
-    var pack = util.findWhere(manifest.packages, {
-      id: packageName
+    var moduleName = $stateParams.module;
+    var module = util.findWhere(manifest.modules, {
+      id: moduleName
     });
 
-    if (!pack) {
-      return $q.reject('Unknown package "' + packageName + '"');
+    if (!module) {
+      return $q.reject('Unknown module "' + moduleName + '"');
     }
 
-    return pack.versions;
+    return module.versions;
   }
 
   function toString(val) {
