@@ -7,6 +7,10 @@
 
   /** @ngInject */
   function runBlock($state, $rootScope, manifest) {
+    if (!manifest.moduleName) {
+      manifest.moduleName = 'gcloud-' + manifest.lang;
+    }
+
     angular.extend($rootScope, manifest);
 
     $rootScope.$on('$stateChangeError', function() {

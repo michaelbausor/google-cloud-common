@@ -18,8 +18,8 @@
 
   /** @ngInject */
   function getLatestRelease($http, manifest) {
-    var endpoint = 'https://api.github.com/repos/GoogleCloudPlatform/gcloud-' +
-      manifest.lang + '/releases/latest';
+    var endpoint = 'https://api.github.com/repos/GoogleCloudPlatform/' +
+      manifest.moduleName + '/releases/latest';
 
     return $http.get(endpoint)
       .then(function(response) {

@@ -158,8 +158,8 @@
 
   /** @ngInject */
   function getLastBuiltDate($http, manifest) {
-    var url = 'https://api.github.com/repos/GoogleCloudPlatform/gcloud-' +
-      manifest.lang + '/commits?sha=gh-pages&per_page=1';
+    var url = 'https://api.github.com/repos/GoogleCloudPlatform/' +
+      manifest.moduleName + '/commits?sha=gh-pages&per_page=1';
 
     return $http({
       method: 'get',
@@ -176,7 +176,7 @@
   function getToc($interpolate, $http, $stateParams, manifest) {
     var tocUrl = $interpolate('{{content}}/{{module}}/{{version}}/toc.json')({
       content: manifest.content,
-      module: $stateParams.module || manifest.defaultPackage,
+      module: $stateParams.module || manifest.defaultModule,
       version: $stateParams.version
     });
 
@@ -189,7 +189,7 @@
   function getTypes($interpolate, $http, $stateParams, manifest) {
     var types = $interpolate('{{content}}/{{module}}/{{version}}/types.json')({
       content: manifest.content,
-      module: $stateParams.module || manifest.defaultPackage,
+      module: $stateParams.module || manifest.defaultModule,
       version: $stateParams.version
     });
 
