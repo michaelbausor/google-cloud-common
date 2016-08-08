@@ -441,6 +441,10 @@ ul {
 .module-switcher.dropdown {
   margin-left: 0;
 
+  .dropdown-current {
+    border-left: none !important;
+  }
+
   .module-name {
     display: block;
     white-space: nowrap;

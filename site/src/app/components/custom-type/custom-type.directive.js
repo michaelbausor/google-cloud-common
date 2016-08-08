@@ -6,21 +6,39 @@
     .directive('customType', customType);
 
   /** @ngInject */
-  function customType($state) {
-    var convertToServicePath = function(customType, method) {
-      var stateName = 'docs.service';
-      var stateParams = {
-        serviceId: customType,
-        version: $state.params.version,
-        module: $state.params.module || ''
-      };
-      var stateOptions = { inherit: false };
+  function customType($state, util) {
+    var convertToServicePath = function(scope, customType, method) {
+      var isInclusive = !!util.findWhere(scope.docs.types, {
+        id: customType
+      });
 
-      if (method) {
-        stateParams.method = method;
+      var href = [
+        '#',
+        'docs'
+      ];
+
+      if (isInclusive) {
+        var params = [
+          $state.params.version,
+          customType
+        ];
+
+        if ($state.params.module) {
+          params.unshift($state.params.module);
+        }
+
+        href = href.concat(params);
+      } else {
+        href.push(customType);
       }
 
-      return $state.href(stateName, stateParams, stateOptions);
+      href = href.join('/');
+
+      if (method) {
+        href += '?method=' + method;
+      }
+
+      return href;
     };
 
     return {
@@ -33,8 +51,9 @@
           // Set narrowest scope as text if no text in element
           elem.html(method ? method : customType);
         }
-        elem.addClass('skip-external-link')
-          .attr('href', convertToServicePath(customType.replace('[]', ''), method));
+
+        var href = convertToServicePath(scope, customType.replace('[]', ''), method);
+        elem.addClass('skip-external-link').attr('href', href);
       }
     };
   }

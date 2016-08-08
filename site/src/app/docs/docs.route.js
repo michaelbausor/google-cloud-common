@@ -11,18 +11,16 @@
     var regSemver = '\\bv?(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-[\\da-z\-]+(?:\\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?\\b';
     var regPackage = '(?!master|\\d).*';
 
-    var baseUrl = [
-      '/docs',
-      '{module:' + regPackage + '}',
-      '{version:master|' + regSemver + '}'
-    ].join('/');
+    var baseUrl = '/docs/' +
+      (manifest.modules ? '{module:' + regPackage + '}/' : '') +
+      '{version:master|' + regSemver + '}';
 
     var latestCoreVersion;
 
     if (manifest.versions) {
       latestCoreVersion = manifest.versions[0];
     } else if (manifest.modules) {
-      latestCoreVersion = manifest.modules[0].latestVersion;
+      latestCoreVersion = manifest.modules[0].versions[0];
     } else {
       throw new Error('Either "versions" or "modules" must be set.');
     }
@@ -55,10 +53,7 @@
         },
         params: {
           version: 'latest',
-          module: {
-            value: null,
-            squash: true
-          }
+          module: manifest.defaultModule
         }
       })
       .state('docs.guides', {
@@ -82,77 +77,27 @@
 
     $urlRouterProvider.when('/docs', '/docs/latest');
 
-    // since /docs/:module/:version is an abstract state, it can't actually
-    // be transitioned to. In the event a user tries to navigate to this
-    // page, we'll find the default service for it and redirect the user there.
-    $urlRouterProvider.when(baseUrl, function($match, $state, manifest, util) {
-      if (!manifest.modules) {
-        return manifest.defaultService || 'gcloud';
-      }
-
-      var module = util.findWhere(manifest.modules, {
-        id: $match.module
-      });
-
-      $match.serviceId = module.defaultService;
-
-      return $state.go('docs.service', $match);
-    });
-
     // begin redirect-mania!
     $urlRouterProvider.otherwise(function($injector, $location) {
-      var homeRoute = '/';
       var path = $location.path();
       var docsBaseUrl = '/docs/';
       var isUnknownRoute = path.indexOf(docsBaseUrl) === -1;
 
       // no idea where they were trying to go.. lets go to the home page
       if (isUnknownRoute) {
-        return homeRoute;
+        return '/';
       }
 
       var params = path.replace(docsBaseUrl, '').split('/');
-      var module;
+      var route = docsBaseUrl;
 
       if (manifest.modules) {
-        module = $injector.get('util').findWhere(manifest.modules, {
-          id: params[0]
-        });
-      }
-
-      if (module) {
-        params.splice(0, 1);
-        docsBaseUrl += module.id + '/';
-      }
-
-      var versions = module ? module.versions : manifest.versions;
-
-      // if we can't confirm the version, let's just go to the home page..
-      if (!versions) {
-        return homeRoute;
-      }
-
-      var version = params[0];
-      var isValidVersion = versions.indexOf(version) !== -1;
-
-      // if we can confirm the version, maybe the service id is bad.. so
-      // we'll head to the default service docs
-      if (isValidVersion) {
-        return docsBaseUrl + version;
-      }
-
-      var latestVersion = versions[0];
-
-      // check for a version alias
-      if (version === 'latest' || version === 'stable') {
-        params[0] = latestVersion;
+        route += getDefaultModuleRoute(params, manifest, $injector);
       } else {
-        // otherwise let's assume the version was omitted altogether
-        params.unshift($injector.get('$stateParams').version || latestVersion);
+        route += getDefaultRoute(params, manifest, $injector);
       }
 
-      // being anew!
-      return docsBaseUrl + params.join('/');
+      return route;
     });
   }
 
@@ -268,6 +213,58 @@
 
   function toString(val) {
     return val ? val.toString() : null;
+  }
+
+  function getDefaultModuleRoute(params, manifest, $injector) {
+    var module = $injector.get('util').findWhere(manifest.modules, {
+      id: params[0]
+    });
+
+    // it's a bad module? let's try the default module
+    if (!module) {
+      params.unshift(manifest.defaultModule);
+      return params.join('/');
+    }
+
+    // could be a version alias
+    if (params[1] === 'latest' || params[1] === 'stable') {
+      params[1] = module.versions[0];
+      return params.join('/');
+    }
+
+    var moduleId = params.shift();
+    var isValidVersion = module.versions.indexOf(params[0]) > -1;
+
+    // maybe it's a bad version? let's try the latest
+    if (!isValidVersion) {
+      return [moduleId, module.versions[0], moduleId].concat(params).join('/');
+    }
+
+    var version = params.shift();
+
+    // if it's not a bad module or version, then likely the service is bad
+    // so we'll go to the default service
+    return [moduleId, version, module.defaultService].join('/');
+  }
+
+  function getDefaultRoute(params, manifest) {
+    if (params[0] === 'latest' || params[0] === 'stable') {
+      params[0] = manifest.versions[0];
+      return params.join('/');
+    }
+
+    var isValidVersion = manifest.versions.indexOf(params[0]) > -1;
+
+    // could be a bad version number..
+    if (!isValidVersion) {
+      params.unshift(manifest.versions[0]);
+      return params.join('/');
+    }
+
+    var version = params.shift();
+
+    // not a bad version number..? Then perhaps a bad service
+    return [version, manifest.defaultService || 'gcloud'].join('/');
   }
 
 }());
