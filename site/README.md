@@ -17,6 +17,9 @@
   * [`home`][home-key]
   * [`package`][package-key]
   * [`methodTypeSymbols`][methodtypesymbols-key]
+  * [`moduleName`][modulename-key]
+  * [`defaultModule`][defaultmodule-key]
+  * [`modules`][modules-key]
 * [Table of Contents][toc]
   * [`overview`][overview-key]
   * [`guides`][guides-key]
@@ -37,6 +40,7 @@
   * [Landing Page][landing-page]
   * [Overview Section][overview-section]
   * [Custom Page Headers][custom-page-headers]
+* [Modular Docs][modular-docs]
 * [Deploying][deploying]
 
 ## Installation
@@ -229,6 +233,49 @@ This optional list allows you to map language-specific method type names (such a
     {
       "type": "instance",
       "symbol": "#"
+    }
+  ]
+}
+```
+
+##### `moduleName`
+
+The name of your module, this is used to create links to GitHub/Stackoverflow/etc.
+
+```js
+{
+  "moduleName": "gcloud-node"
+}
+```
+
+##### `defaultModule`
+
+When using [modular docs][modular-docs], use this key to set the default module. The app will direct the user to this module in the event of an error and/or when the module has been omitted altogether.
+
+The value should be the `id` of a module listed within the [`modules`][modules-key] array.
+
+```js
+{
+  "defaultModule": "google-cloud"
+}
+```
+
+##### `modules`
+
+This field is only needed when using modular docs. When present it should contain a list of separate modules you wish to display docs for.
+
+```js
+{
+  "modules": [
+    {
+      "id": "google-cloud", // id used for routing
+      "name": "google-cloud", // name used for display purposes
+      "defaultService": "storage", // default service page
+      "versions": [ // available versions of the module
+        "v0.29.0",
+        "v0.10.0",
+        "master"
+      ]
     }
   ]
 }
@@ -510,6 +557,29 @@ See [gcloud-node docs][gcloud-node-docs] for a working demo. The contents of the
 
 See a living example of gcloud-node's overview template [here][gcloud-node-overview].
 
+## Modular Docs
+
+If your library uses a modular approach (a separate installable package per service), you can optionally leverage the modular docs. To do this you must first make sure that your [manifest][manifest] contains the [`modules`][modules-key] and [`defaultModule`][defaultmodule-key] fields.
+
+After which, you must create a folder within your content directory for each package. Each package should map to a module listed within your manifest. Here is an example of what your content folder should resemble
+
+```sh
+json
+ ├─── bigquery #standalone package
+ |     └─── master
+ |           ├─── toc.json # table of contents for this version
+ |           ├─── types.json # list of custom types for this version
+ |           └─── index.json # # one file per class/module/etc.
+ |
+ └─── google-cloud # bundled package
+       └─── v0.28.0
+             ├─── toc.json # table of contents for this version
+             ├─── types.json # list of custom types for this version
+             └─── storage # one folder per service
+                   ├─── index.json 
+                   └─── bucket.json
+```
+
 ## Deploying
 
 Integrating the shared docs app is fairly painless. There is a [shell script][gcloud-common-deploy] that will push the updated site code to your `gh-pages` after a successful merge. To enable this, simply append a command to push to your repo to the script.
@@ -539,6 +609,9 @@ Please refer to gcloud-node's [`gh-pages` branch][gcloud-node-ghpages] for an ex
 [guides-key]: #guides-key
 [services-key]: #services-key
 [package-key]: #package-key
+[modulename-key]: #modulename-key
+[defaultmodule-key]: #defaultmodule-key
+[modules-key]: #modules-key
 [json-schema]: #json-docs-schema
 [id-key]: #id-key
 [description-keys]: #description-and-caption-keys
@@ -558,6 +631,7 @@ Please refer to gcloud-node's [`gh-pages` branch][gcloud-node-ghpages] for an ex
 [types]: #types
 [types-key]: #types-key
 [methodtypesymbols-key]: #methodtypesymbols-key
+[modular-docs]: #modular-docs
 
 [nodejs]: https://nodejs.org/en/
 [hljs]: https://highlightjs.org/
