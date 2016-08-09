@@ -89,15 +89,15 @@
       }
 
       var params = path.replace(docsBaseUrl, '').split('/');
-      var route = docsBaseUrl;
+      var correctedParams;
 
       if (manifest.modules) {
-        route += getDefaultModuleRoute(params, manifest, $injector);
+        correctedParams = getDefaultModuleParams(params, manifest, $injector);
       } else {
-        route += getDefaultRoute(params, manifest, $injector);
+        correctedParams = getDefaultParams(params, manifest, $injector);
       }
 
-      return route;
+      return docsBaseUrl + correctedParams.join('/');
     });
   }
 
@@ -215,7 +215,7 @@
     return val ? val.toString() : null;
   }
 
-  function getDefaultModuleRoute(params, manifest, $injector) {
+  function getDefaultModuleParams(params, manifest, $injector) {
     var module = $injector.get('util').findWhere(manifest.modules, {
       id: params[0]
     });
@@ -223,13 +223,13 @@
     // it's a bad module? let's try the default module
     if (!module) {
       params.unshift(manifest.defaultModule);
-      return params.join('/');
+      return params;
     }
 
     // could be a version alias
     if (params[1] === 'latest' || params[1] === 'stable') {
       params[1] = module.versions[0];
-      return params.join('/');
+      return params;
     }
 
     var moduleId = params.shift();
@@ -237,20 +237,20 @@
 
     // maybe it's a bad version? let's try the latest
     if (!isValidVersion) {
-      return [moduleId, module.versions[0], moduleId].concat(params).join('/');
+      return [moduleId, module.versions[0], moduleId].concat(params);
     }
 
     var version = params.shift();
 
     // if it's not a bad module or version, then likely the service is bad
     // so we'll go to the default service
-    return [moduleId, version, module.defaultService].join('/');
+    return [moduleId, version, module.defaultService];
   }
 
-  function getDefaultRoute(params, manifest) {
+  function getDefaultParams(params, manifest) {
     if (params[0] === 'latest' || params[0] === 'stable') {
       params[0] = manifest.versions[0];
-      return params.join('/');
+      return params;
     }
 
     var isValidVersion = manifest.versions.indexOf(params[0]) > -1;
@@ -258,13 +258,13 @@
     // could be a bad version number..
     if (!isValidVersion) {
       params.unshift(manifest.versions[0]);
-      return params.join('/');
+      return params;
     }
 
     var version = params.shift();
 
     // not a bad version number..? Then perhaps a bad service
-    return [version, manifest.defaultService || 'gcloud'].join('/');
+    return [version, manifest.defaultService || 'gcloud'];
   }
 
 }());
