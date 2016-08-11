@@ -17,6 +17,11 @@
       "type": "string",
       "description": "Brief overview of the service"
     },
+    "overview": {
+      "id": "overview",
+      "type": "string",
+      "description": "Replacement for overview.html file"
+    },
     "resources": {
       "id": "resources",
       "type": "array",

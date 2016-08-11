@@ -15,7 +15,7 @@
       .map(DocsService.setAsTrusted)
       .sort(sortMethods);
 
-    service.libraryTitle = manifest.libraryTitle || 'gcloud';
+    service.libraryTitle = manifest.libraryTitle || 'Google Cloud';
     service.methodNames = service.methods.map(getName);
     service.showGettingStarted = false;
 

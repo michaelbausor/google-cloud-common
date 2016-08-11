@@ -389,7 +389,7 @@ ul {
  Menu
 */
 
-.nav-current {
+.dropdown-current {
     display: block;
     position: absolute;
     top: 1.2em;
@@ -401,7 +401,7 @@ ul {
     cursor: pointer;
 }
 
-.page-header.fixed .nav-current {
+.page-header.fixed .dropdown-current {
     top: 1em;
 }
 
@@ -411,6 +411,7 @@ ul {
     top: 3.6em;
     right: 0;
     width: 100%;
+    max-height: 400px;
     bottom: 0;
     overflow-y: auto;
     margin: 0;
@@ -432,6 +433,28 @@ ul {
     position: absolute;
     bottom: initial;
     z-index: 1;
+}
+
+.language-switcher.dropdown {
+  margin-right: 0;
+}
+
+.module-switcher.dropdown {
+  margin-left: 0;
+
+  .dropdown-current {
+    border-left: none !important;
+  }
+
+  .module-name {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .module-version {
+    display: block;
+    font-size: 0.8em;
+  }
 }
 
 .page-header.fixed .menu {
@@ -484,11 +507,11 @@ ul {
  Open Menu
  */
 
-.main-nav.open .nav-current {
+.dropdown.open .dropdown-current {
     opacity: 0.4;
 }
 
-.main-nav.open .menu {
+.dropdown.open .menu {
     display: block;
 }
 
@@ -1361,7 +1384,7 @@ ul {
         top: 20px;
     }
 
-    .nav-current {
+    .dropdown-current {
         top: 26px !important;
     }
 
@@ -1449,31 +1472,28 @@ ul {
         position: absolute;
     }
 
-    .main-nav {
+    .dropdown {
         margin: 0 1.3em;
-        position: absolute;
-        top: 1.2em;
+        position: relative
     }
 
-    .page-header.fixed .main-nav {
-        top: 0;
-    }
-
-    .nav-current {
+    .dropdown-current {
         position: relative;
-        top: 0 !important;
+        top: -5px !important;
         left: 0;
         padding: 0.8em 1.6em;
-        width: 150px;
+        min-width: 150px;
+        width: auto;
         height: auto;
         border: 1px solid rgba(255,255,255,0.4);
         background: url(../assets/images/icon-dropdown.svg) 90% 50% no-repeat;
         text-indent: 0;
     }
 
-    .page-header.fixed .nav-current {
-        top: 0;
-        padding: 0 1.6em;
+    .page-header.fixed .dropdown-current {
+        top: 0 !important;
+        padding: 0 3.4em 0 1.6em;
+        // padding: 0 1.6em;
         height: 70px;
         border: 1px solid rgba(255,255,255,0.2);
         border-top: none;
@@ -1481,7 +1501,7 @@ ul {
         line-height: 70px;
     }
 
-    .nav-current:hover {
+    .dropdown-current:hover {
         background-color: rgba(255,255,255,0.1);
     }
 

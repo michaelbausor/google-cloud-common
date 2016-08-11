@@ -6,16 +6,18 @@
     .controller('DocsCtrl', DocsCtrl);
 
   /** @ngInject */
-  function DocsCtrl($state, langs, manifest, toc, lastBuiltDate) {
+  function DocsCtrl($state, langs, manifest, toc, types, lastBuiltDate, versions) {
     var docs = this;
 
-    docs.libraryTitle = manifest.libraryTitle || 'gcloud';
+    docs.libraryTitle = manifest.libraryTitle || 'Google Cloud';
     docs.langs = langs;
     docs.lastBuiltDate = lastBuiltDate;
     docs.guides = toc.guides;
     docs.services = toc.services;
+    docs.versions = versions;
     docs.version = $state.params.version;
     docs.overviewFileUrl = null;
+    docs.types = types;
 
     docs.selectedVersion = docs.version;
     docs.loadVersion = loadVersion;
@@ -25,6 +27,7 @@
     if (toc.overview) {
       docs.overviewFileUrl = [
         manifest.content,
+        $state.params.module,
         $state.params.version,
         toc.overview
       ].join('/');

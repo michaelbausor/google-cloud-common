@@ -1,0 +1,8 @@
+<nav class="dropdown" ng-class="{ open: dropdown.isOpen }">
+  <div class="dropdown-current" ng-click="dropdown.isOpen = !dropdown.isOpen">
+    {{dropdown.selected}}
+  </div>
+  <div ng-click="dropdown.isOpen = false">
+    <ul class="menu" ng-transclude></ul>
+  </div>
+</nav>

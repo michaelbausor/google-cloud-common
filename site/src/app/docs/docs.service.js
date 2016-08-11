@@ -30,6 +30,10 @@
         method.params = method.params.map(trustParam);
       }
 
+      if (method.overview) {
+        method.overview = $sce.trustAsHtml(method.overview);
+      }
+
       return method;
     }
 

@@ -34,8 +34,9 @@
         return $sce.trustAsResourceUrl(content);
       }
 
-      return $interpolate('{{content}}/{{version}}/{{data}}')({
+      return $interpolate('{{content}}/{{module}}/{{version}}/{{data}}')({
         content: manifest.content,
+        module: $state.params.module || '',
         version: $state.params.version,
         data: content
       });

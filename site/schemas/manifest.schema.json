@@ -22,6 +22,16 @@
       "type": "string",
       "description": "Custom service type to load by default."
     },
+    "moduleName": {
+      "id": "moduleName",
+      "type": "string",
+      "description": "Name of the module used to link to Github repo"
+    },
+    "defaultModule": {
+      "id": "defaultModule",
+      "type": "string",
+      "description": "id of default module when using modular docs"
+    },
     "markdown": {
       "id": "markdown",
       "type": "string",
@@ -93,15 +103,68 @@
           "symbol"
         ]
       }
+    },
+    "modules": {
+      "id": "modules",
+      "type": "array",
+      "description": "List of modules and their versions",
+      "items": {
+        "id": "module",
+        "type": "object",
+        "description": "Information for individual module",
+        "properties": {
+          "id": {
+            "id": "id",
+            "type": "string",
+            "description": "id used within route parameter"
+          },
+          "name": {
+            "id": "name",
+            "type": "string",
+            "description": "Friendly name used for module switching dropdown"
+          },
+          "defaultService": {
+            "id": "defaultService",
+            "type": "string",
+            "description": "The id of the default service for the module"
+          },
+          "versions": {
+            "id": "versions",
+            "type": "array",
+            "description": "An array of all available versions for this module",
+            "items": {
+              "id": "version",
+              "type": "string",
+              "description": "The semver version string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "defaultService",
+          "versions"
+        ]
+      }
     }
   },
   "required": [
     "lang",
     "friendlyLang",
+    "moduleName",
     "markdown",
-    "versions",
     "content",
     "home",
     "package"
-  ]
+  ],
+  "oneOf": [{
+    "required": [
+      "versions"
+    ]
+  }, {
+    "required": [
+      "defaultModule",
+      "modules"
+    ]
+  }]
 }
