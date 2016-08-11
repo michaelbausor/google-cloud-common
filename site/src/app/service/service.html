@@ -1,7 +1,7 @@
 <page-header title="service.title"></page-header>
 <version-switcher class="invisible-lg side-nav--meta--top"></version-switcher>
 <article class="content">
-  <div ng-if="docs.overviewFileUrl">
+  <div ng-if="::(docs.overviewFileUrl || service.overview)">
     <h3 class="sub-heading toggle" ng-click="service.showGettingStarted = !service.showGettingStarted">
       <div class="toggler">
         <span ng-if="!service.showGettingStarted">▹</span>
@@ -11,9 +11,12 @@
         Getting Started
       </span>
     </h3>
-    <article
+    <article ng-if="::docs.overviewFileUrl"
       ng-show="service.showGettingStarted"
       ng-include="docs.overviewFileUrl"></article>
+    <article ng-if="::service.overview"
+      ng-show="service.showGettingStarted"
+      bind-html-compile="service.overview"></article>
     <hr />
   </div>
   <article ng-if="service.description || service.resources.length" class="description">
