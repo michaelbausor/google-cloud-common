@@ -411,6 +411,7 @@ ul {
     top: 3.6em;
     right: 0;
     width: 100%;
+    max-height: 400px;
     bottom: 0;
     overflow-y: auto;
     margin: 0;
@@ -1478,10 +1479,10 @@ ul {
 
     .dropdown-current {
         position: relative;
-        top: 0 !important;
+        top: -5px !important;
         left: 0;
         padding: 0.8em 1.6em;
-        min-width: 122px;
+        min-width: 150px;
         width: auto;
         height: auto;
         border: 1px solid rgba(255,255,255,0.4);
@@ -1490,7 +1491,7 @@ ul {
     }
 
     .page-header.fixed .dropdown-current {
-        top: 0;
+        top: 0 !important;
         padding: 0 3.4em 0 1.6em;
         // padding: 0 1.6em;
         height: 70px;
