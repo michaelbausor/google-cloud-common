@@ -1,7 +1,7 @@
 <page-header title="service.title"></page-header>
 <version-switcher class="invisible-lg side-nav--meta--top"></version-switcher>
 <article class="content">
-  <div ng-if="::(docs.overviewFileUrl || service.overview)">
+  <div ng-if="::docs.overviewFileUrl">
     <h3 class="sub-heading toggle" ng-click="service.showGettingStarted = !service.showGettingStarted">
       <div class="toggler">
         <span ng-if="!service.showGettingStarted">▹</span>
@@ -14,12 +14,9 @@
     <article ng-if="::docs.overviewFileUrl"
       ng-show="service.showGettingStarted"
       ng-include="docs.overviewFileUrl"></article>
-    <article ng-if="::service.overview"
-      ng-show="service.showGettingStarted"
-      bind-html-compile="service.overview"></article>
     <hr />
   </div>
-  <article ng-if="service.description || service.resources.length" class="description">
+  <article ng-if="::((!service.overview && service.description) || service.resources.length)" class="description">
     <h3>{{::service.name}} Overview</h3>
     <div ng-if="service.description" bind-html-compile="service.description"></div>
     <section ng-if="service.resources.length">
@@ -53,6 +50,9 @@
         {{::method.name}}
       </a>
     </h3>
+    <div
+      ng-if="::(method.isConstructor && service.overview)"
+      bind-html-compile="service.overview"></div>
     <div bind-html-compile="method.description"></div>
     <section ng-if="method.params.length">
       <h4>Parameters</h4>
