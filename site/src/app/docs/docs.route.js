@@ -237,7 +237,14 @@
 
     // maybe it's a bad version? let's try the latest
     if (!isValidVersion) {
-      return [moduleId, module.versions[0], moduleId].concat(params);
+      var corrected = [moduleId, module.versions[0]];
+      var isGuide = params[0] === 'guides';
+
+      if (!isGuide) {
+        corrected.push(moduleId);
+      }
+
+      return corrected.concat(params);
     }
 
     var version = params.shift();
