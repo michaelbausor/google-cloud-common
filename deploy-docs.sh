@@ -68,6 +68,8 @@ function deploy_docs {
   else
     echo "Nothing to commit. Exiting without pushing changes."
   fi
+  
+  cd ..
 }
 
 deploy_docs "googlecloudplatform/gcloud-node"
