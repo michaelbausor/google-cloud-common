@@ -16,11 +16,11 @@
     }, {
       friendly: 'Node.js',
       key: 'node',
-      repo: 'gcloud-node'
+      repo: 'google-cloud-node'
     }, {
       friendly: 'PHP',
       key: 'php',
-      repo: 'gcloud-php'
+      repo: 'google-cloud-php'
     }, {
       friendly: 'Python',
       key: 'python',
