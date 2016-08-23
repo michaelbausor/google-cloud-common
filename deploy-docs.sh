@@ -29,11 +29,11 @@ if [ "${TRAVIS_BRANCH}" != "master" ] || [ "${TRAVIS_PULL_REQUEST}" != "false" ]
   then exit 0
 fi
 
-function deploy_docs {
-  # Install dependencies & run the build (minify, concatenate dependencies, etc.)
-  bower install
-  gulp build
+# Install dependencies & run the build (minify, concatenate dependencies, etc.)
+bower install
+gulp build
 
+function deploy_docs {
   # Pull down the target client library's gh-pages branch.
   git submodule add -f -b gh-pages https://${GH_OAUTH_TOKEN}@github.com/$1 gh-pages
   cd gh-pages
@@ -69,7 +69,11 @@ function deploy_docs {
     echo "Nothing to commit. Exiting without pushing changes."
   fi
   
+  # Remove the gh-pages submodule.
   cd ..
+  git submodule deinit -f gh-pages
+  git rm -f gh-pages ../.gitmodules
+  rm -rf ../.git/modules/gh-pages
 }
 
 deploy_docs "googlecloudplatform/gcloud-node"
