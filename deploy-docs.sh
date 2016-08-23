@@ -76,5 +76,5 @@ function deploy_docs {
   rm -rf ../.git/modules/gh-pages
 }
 
-deploy_docs "googlecloudplatform/gcloud-node"
+deploy_docs "googlecloudplatform/google-cloud-node"
 deploy_docs "googlecloudplatform/gcloud-python"
