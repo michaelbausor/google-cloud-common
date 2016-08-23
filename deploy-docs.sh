@@ -35,7 +35,7 @@ gulp build
 
 function deploy_docs {
   # Pull down the target client library's gh-pages branch.
-  git submodule add -f -b gh-pages https://${GH_OAUTH_TOKEN}@github.com/$1 gh-pages
+  git submodule add -f --name $1 -b gh-pages https://${GH_OAUTH_TOKEN}@github.com/$1 gh-pages
   cd gh-pages
 
   # Remove the old site content. We're going to replace it.
