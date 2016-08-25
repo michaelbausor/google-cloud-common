@@ -35,7 +35,7 @@ gulp build
 
 function deploy_docs {
   # Pull down the target client library's gh-pages branch.
-  git submodule add -f --name $1 -b gh-pages https://${GH_OAUTH_TOKEN}@github.com/$1 gh-pages
+  git submodule add -q -f --name $1 -b gh-pages https://${GH_OAUTH_TOKEN}@github.com/$1 gh-pages
   cd gh-pages
 
   # Remove the old site content. We're going to replace it.
@@ -64,14 +64,14 @@ function deploy_docs {
 
     https://github.com/GoogleCloudPlatform/gcloud-common/commit/${TRAVIS_COMMIT}"
     git status
-    git push https://${GH_OAUTH_TOKEN}@github.com/$1 HEAD:gh-pages
+    git push -q https://${GH_OAUTH_TOKEN}@github.com/$1 HEAD:gh-pages
   else
     echo "Nothing to commit. Exiting without pushing changes."
   fi
   
   # Remove the gh-pages submodule.
   cd ..
-  git submodule deinit -f gh-pages
+  git submodule deinit -q -f gh-pages
   git rm -f gh-pages ../.gitmodules
   rm -rf ../.git/modules/gh-pages
 }
