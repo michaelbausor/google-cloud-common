@@ -33,5 +33,17 @@
 
       expect(el.attr('href')).toBe(expectedPath);
     });
+
+    it('should ignore hash characters', function() {
+      var fakeAnchor = 'test';
+      var el = angular.element('<a data-anchor="#' + fakeAnchor + '">Test</a>');
+
+      $compile(el)($scope);
+      $scope.$digest();
+
+      var expectedPath = '#' + FAKE_PATH + '?section=' + fakeAnchor;
+
+      expect(el.attr('href')).toBe(expectedPath);
+    });
   });
 }());

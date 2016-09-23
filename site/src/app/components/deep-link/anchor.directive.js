@@ -10,7 +10,7 @@
     return {
       restrict: 'A',
       link: function(scope, elem, attrs) {
-        var anchor = attrs.anchor;
+        var anchor = attrs.anchor.replace(/^\#/, '');
         var href = '#' + $location.path() + '?section=' + anchor;
 
         elem.attr('href', href);
