@@ -73,7 +73,7 @@
         }
       })
       .state('docs.service', {
-        url: '/{serviceId:nonURIEncoded}?method',
+        url: '/{serviceId:nonURIEncoded}?method&section',
         templateUrl: 'app/service/service.html',
         controller: 'ServiceCtrl',
         controllerAs: 'service',
