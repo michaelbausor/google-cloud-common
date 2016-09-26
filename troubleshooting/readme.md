@@ -38,13 +38,12 @@ If you're experiencing a bug with the code, or have an idea for how it can be im
   - [`google-cloud-python` on GitHub][gh-python]
   - [`google-cloud-ruby` on GitHub][gh-ruby]
 
-
-[so-golang]: http://stackoverflow.com/questions/tagged/gcloud-go
-[so-java]: http://stackoverflow.com/questions/tagged/gcloud-java
-[so-node]: http://stackoverflow.com/questions/tagged/gcloud-node
-[so-php]: http://stackoverflow.com/questions/tagged/gcloud-php
-[so-python]: http://stackoverflow.com/questions/tagged/gcloud-python
-[so-ruby]: http://stackoverflow.com/questions/tagged/gcloud-ruby
+[so-golang]: http://stackoverflow.com/questions/tagged/google-cloud-platform+go
+[so-java]: http://stackoverflow.com/questions/tagged/google-cloud-platform+java
+[so-node]: http://stackoverflow.com/questions/tagged/google-cloud-platform+node
+[so-php]: http://stackoverflow.com/questions/tagged/google-cloud-platform+php
+[so-python]: http://stackoverflow.com/questions/tagged/google-cloud-platform+python
+[so-ruby]: http://stackoverflow.com/questions/tagged/google-cloud-platform+ruby
 
 [gh-search-golang]: https://github.com/googlecloudplatform/google-cloud-go/issues?&q=
 [gh-search-java]: https://github.com/googlecloudplatform/google-cloud-java/issues?&q=
