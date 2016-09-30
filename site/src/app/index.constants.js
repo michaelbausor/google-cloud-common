@@ -24,7 +24,7 @@
     }, {
       friendly: 'Python',
       key: 'python',
-      repo: 'gcloud-python'
+      repo: 'google-cloud-python'
     }, {
       friendly: 'Ruby',
       key: 'ruby',
