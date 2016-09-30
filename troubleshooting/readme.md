@@ -9,15 +9,17 @@ If you have a question about how to use a Google Cloud client library in your pr
 
 First, check out the appropriate tag on StackOverflow:
 
-  - [`gcloud-golang` on StackOverflow][so-golang]
-  - [`gcloud-java` on StackOverflow][so-java]
-  - [`gcloud-node` on StackOverflow][so-node]
-  - [`gcloud-php` on StackOverflow][so-php]
-  - [`gcloud-python` on StackOverflow][so-python]
-  - [`gcloud-ruby` on StackOverflow][so-ruby]
+  - [`google-cloud-platform+c#` on StackOverflow][so-dotnet]
+  - [`google-cloud-platform+golang` on StackOverflow][so-golang]
+  - [`google-cloud-platform+java` on StackOverflow][so-java]
+  - [`google-cloud-platform+node` on StackOverflow][so-node]
+  - [`google-cloud-platform+php` on StackOverflow][so-php]
+  - [`google-cloud-platform+python` on StackOverflow][so-python]
+  - [`google-cloud-platform+ruby` on StackOverflow][so-ruby]
 
 Next, try searching through the issues on GitHub:
 
+  - [`google-cloud-dotnet` Issues on GitHub][gh-search-dotnet]
   - [`google-cloud-go` Issues on GitHub][gh-search-golang]
   - [`google-cloud-java` Issues on GitHub][gh-search-java]
   - [`google-cloud-node` Issues on GitHub][gh-search-node]
@@ -31,6 +33,7 @@ Still nothing?
 
 If you're experiencing a bug with the code, or have an idea for how it can be improved, *please* create a new issue on GitHub so we can talk about it.
 
+  - [`google-cloud-dotnet` on GitHub][gh-dotnet]
   - [`google-cloud-go` on GitHub][gh-golang]
   - [`google-cloud-java` on GitHub][gh-java]
   - [`google-cloud-node` on GitHub][gh-node]
@@ -38,6 +41,7 @@ If you're experiencing a bug with the code, or have an idea for how it can be im
   - [`google-cloud-python` on GitHub][gh-python]
   - [`google-cloud-ruby` on GitHub][gh-ruby]
 
+[so-dotnet]: http://stackoverflow.com/questions/tagged/google-cloud-platform+c%23
 [so-golang]: http://stackoverflow.com/questions/tagged/google-cloud-platform+go
 [so-java]: http://stackoverflow.com/questions/tagged/google-cloud-platform+java
 [so-node]: http://stackoverflow.com/questions/tagged/google-cloud-platform+node
@@ -45,6 +49,7 @@ If you're experiencing a bug with the code, or have an idea for how it can be im
 [so-python]: http://stackoverflow.com/questions/tagged/google-cloud-platform+python
 [so-ruby]: http://stackoverflow.com/questions/tagged/google-cloud-platform+ruby
 
+[gh-search-dotnet]: https://github.com/googlecloudplatform/google-cloud-dotnet/issues?&q=
 [gh-search-golang]: https://github.com/googlecloudplatform/google-cloud-go/issues?&q=
 [gh-search-java]: https://github.com/googlecloudplatform/google-cloud-java/issues?&q=
 [gh-search-node]: https://github.com/googlecloudplatform/google-cloud-node/issues?&q=
@@ -52,6 +57,7 @@ If you're experiencing a bug with the code, or have an idea for how it can be im
 [gh-search-python]: https://github.com/googlecloudplatform/google-cloud-python/issues?&q=
 [gh-search-ruby]: https://github.com/googlecloudplatform/google-cloud-ruby/issues?&q=
 
+[gh-dotnet]: https://github.com/googlecloudplatform/google-cloud-dotnet/issues/new
 [gh-golang]: https://github.com/googlecloudplatform/google-cloud-go/issues/new
 [gh-java]: https://github.com/googlecloudplatform/google-cloud-java/issues/new
 [gh-node]: https://github.com/googlecloudplatform/google-cloud-node/issues/new
