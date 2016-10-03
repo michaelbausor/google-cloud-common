@@ -2,12 +2,13 @@
 
 Get up and running with your Google Cloud Platform client library.
 
-  - Go - [gcloud-golang](https://github.com/googlecloudplatform/gcloud-golang)
-  - Java - [gcloud-java](https://github.com/googlecloudplatform/gcloud-java)
-  - Node.js - [gcloud-node](https://github.com/googlecloudplatform/gcloud-node)
-  - PHP - [gcloud-php](https://github.com/googlecloudplatform/gcloud-php)
-  - Python - [gcloud-python](https://github.com/googlecloudplatform/gcloud-python)
-  - Ruby - [gcloud-ruby](https://github.com/googlecloudplatform/gcloud-ruby)
+  - C# - [google-cloud-dotnet](https://github.com/googlecloudplatform/google-cloud-dotnet)
+  - Go - [google-cloud-go](https://github.com/googlecloudplatform/google-cloud-go)
+  - Java - [google-cloud-java](https://github.com/googlecloudplatform/google-cloud-java)
+  - Node.js - [google-cloud-node](https://github.com/googlecloudplatform/google-cloud-node)
+  - PHP - [google-cloud-php](https://github.com/googlecloudplatform/google-cloud-php)
+  - Python - [google-cloud-python](https://github.com/googlecloudplatform/google-cloud-python)
+  - Ruby - [google-cloud-ruby](https://github.com/googlecloudplatform/google-cloud-ruby)
 
 #### [Authentication Guide](authentication/readme.md)
 
@@ -15,10 +16,9 @@ How to enable the correct APIs for your project, create a service account, gener
 
 #### [Frequently Asked Questions](faq/readme.md)
 
-Common questions about using the gcloud client libraries, including:
+Common questions about using the google-cloud client libraries, including:
 
   - [What's the difference between Project Name and Project ID?](faq/readme.md#project-terms)
-  - [What's the relationship between gcloud-* and the gcloud command-line tool?](faq/readme.md#gcloud-sdk)
 
 #### [Troubleshooting](troubleshooting/readme.md)
 
