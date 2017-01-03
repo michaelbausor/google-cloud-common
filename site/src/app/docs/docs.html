@@ -42,9 +42,14 @@
       </li>
       <li ng-repeat="service in docs.services">
         <a side-nav-link="/{{service.type}}">{{service.title || service.type}}</a>
-        <ul class="sub-sections" ng-if="service.nav && docs.isActive(service.type)">
+        <ul class="sub-sections" ng-if="service.nav && docs.isActive(service)">
           <li ng-repeat="page in service.nav">
             <a side-nav-link="/{{page.type}}">{{page.title || page.type}}</a>
+            <ul class="sub-sections-2" ng-if="page.nav && docs.isActive(page)">
+              <li ng-repeat="page_2 in page.nav">
+                <a side-nav-link="/{{page_2.type}}">{{page_2.title || page_2.type}}</a>
+              </li>
+            </ul>
           </li>
         </ul>
       </li>
