@@ -33,11 +33,12 @@ If you are running this client on Google Compute Engine, we handle authenticatio
 ## On Your Own Server
 
 If you are not running this client on Google Compute Engine, you need a Google Developers service account.
-  1. Visit the [Google Developers Console][dev-console].
 
-  1. Create a new project or click on an existing project.
+1.  Visit the [Google Developers Console][dev-console].
 
-  1. Activate the slide-out navigation tray and select **API Manager**. From here, you will enable the APIs that your application requires.
+1.  Create a new project or click on an existing project.
+
+1.  Activate the slide-out navigation tray and select **API Manager**. From here, you will enable the APIs that your application requires.
 
     ![Enable the APIs that your application requires][enable-apis]
 
@@ -55,7 +56,7 @@ If you are not running this client on Google Compute Engine, you need a Google D
       * Google Cloud Storage
       * Google Cloud Storage JSON API
 
-  1. Select **Credentials** from the side navigation.
+1.  Select **Credentials** from the side navigation.
 
     You should see a screen like one of the following.
 
@@ -73,7 +74,7 @@ If you are not running this client on Google Compute Engine, you need a Google D
 
 
 [gce-how-to]: https://cloud.google.com/compute/docs/authentication#using
-[dev-console]: https://console.developers.google.com/project
+[dev-console]: https://console.cloud.google.com/project
 
 [enable-apis]: https://raw.githubusercontent.com/GoogleCloudPlatform/gcloud-common/master/authentication/enable-apis.png
 
