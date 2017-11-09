@@ -10,5 +10,7 @@ following the standard client specification.
    - `tests.binprotos`: all the tests in a single file. The protos are in binary
       format, each preceded by its length encoded as a varint.
 
-Do not modify the tests here. Regenerate them using the Go program at
-`cloud.google.com/go/firestore/cmd/generate-firestore-tests`.
+- `cmd/generate-firestore-tests/generate-firestore-tests.go`: the Go program that generates the tests.
+
+- `Makefile`: Fulfill the prerequisites at the top of the file, then run `make`
+   to regenerate the tests.
