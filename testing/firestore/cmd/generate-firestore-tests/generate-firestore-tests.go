@@ -22,6 +22,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	tpb "cloud.google.com/go/firestore/genproto"
 	"github.com/golang/protobuf/proto"
@@ -50,6 +51,7 @@ var (
 
 // A writeTest describes a Create, Set, Update or UpdatePaths call.
 type writeTest struct {
+	suffix           string             // textproto filename suffix
 	desc             string             // short description
 	comment          string             // detailed explanation (comment in textproto file)
 	commentForUpdate string             // additional comment for update operations.
@@ -69,6 +71,7 @@ type writeTest struct {
 var (
 	basicTests = []writeTest{
 		{
+			suffix:        "basic",
 			desc:          "basic",
 			comment:       `A simple call, resulting in a single update operation.`,
 			inData:        `{"a": 1}`,
@@ -78,6 +81,7 @@ var (
 			outData:       mp("a", 1),
 		},
 		{
+			suffix:        "complex",
 			desc:          "complex",
 			comment:       `A call to a write method with complicated input data.`,
 			inData:        `{"a": [1, 2.5], "b": {"c": ["three", {"d": true}]}}`,
@@ -94,18 +98,21 @@ var (
 	// tests for Create and Set
 	createSetTests = []writeTest{
 		{
+			suffix:  "nosplit",
 			desc:    "don’t split on dots", // go/set-update #1
 			comment: `Create and Set treat their map keys literally. They do not split on dots.`,
 			inData:  `{ "a.b": { "c.d": 1 }, "e": 2 }`,
 			outData: mp("a.b", mp("c.d", 1), "e", 2),
 		},
 		{
+			suffix:  "special-chars",
 			desc:    "non-alpha characters in map keys",
 			comment: `Create and Set treat their map keys literally. They do not escape special characters.`,
 			inData:  `{ "*": { ".": 1 }, "~": 2 }`,
 			outData: mp("*", mp(".", 1), "~", 2),
 		},
 		{
+			suffix:  "nodel",
 			desc:    "Delete cannot appear in data",
 			comment: `The Delete sentinel cannot be used in Create, or in Set without a Merge option.`,
 			inData:  `{"a": 1, "b": "Delete"}`,
@@ -116,7 +123,8 @@ var (
 	// tests for Update and UpdatePaths
 	updateTests = []writeTest{
 		{
-			desc: "Delete",
+			suffix: "del",
+			desc:   "Delete",
 			comment: `If a field's value is the Delete sentinel, then it doesn't appear
 in the update data, but does in the mask.`,
 			inData:  `{"a": 1, "b": "Delete"}`,
@@ -126,7 +134,8 @@ in the update data, but does in the mask.`,
 			mask:    []string{"a", "b"},
 		},
 		{
-			desc: "Delete alone",
+			suffix: "del-alone",
+			desc:   "Delete alone",
 			comment: `If the input data consists solely of Deletes, then the update
 operation has no map, just an update mask.`,
 			inData:  `{"a": "Delete"}`,
@@ -136,6 +145,7 @@ operation has no map, just an update mask.`,
 			mask:    []string{"a"},
 		},
 		{
+			suffix:  "uptime",
 			desc:    "last-update-time precondition",
 			comment: `The Update call supports a last-update-time precondition.`,
 			inData:  `{"a": 1}`,
@@ -146,6 +156,7 @@ operation has no map, just an update mask.`,
 			mask:    []string{"a"},
 		},
 		{
+			suffix:  "no-paths",
 			desc:    "no paths",
 			comment: `It is a client-side error to call Update with empty data.`,
 			inData:  `{}`,
@@ -154,6 +165,7 @@ operation has no map, just an update mask.`,
 			isErr:   true,
 		},
 		{
+			suffix:  "fp-empty-component",
 			desc:    "empty field path component",
 			comment: `Empty fields are not allowed.`,
 			inData:  `{"a..b": 1}`,
@@ -162,6 +174,7 @@ operation has no map, just an update mask.`,
 			isErr:   true,
 		},
 		{
+			suffix:  "prefix-1",
 			desc:    "prefix #1",
 			comment: `In the input data, one field cannot be a prefix of another.`,
 			inData:  `{"a.b": 1, "a": 2}`,
@@ -170,6 +183,7 @@ operation has no map, just an update mask.`,
 			isErr:   true,
 		},
 		{
+			suffix:  "prefix-2",
 			desc:    "prefix #2",
 			comment: `In the input data, one field cannot be a prefix of another.`,
 			inData:  `{"a": 1, "a.b": 2}`,
@@ -178,6 +192,7 @@ operation has no map, just an update mask.`,
 			isErr:   true,
 		},
 		{
+			suffix:  "del-nested",
 			desc:    "Delete cannot be nested",
 			comment: `The Delete sentinel must be the value of a top-level key.`,
 			inData:  `{"a": {"b": "Delete"}}`,
@@ -186,6 +201,7 @@ operation has no map, just an update mask.`,
 			isErr:   true,
 		},
 		{
+			suffix:  "exists-precond",
 			desc:    "Exists precondition is invalid",
 			comment: `The Update method does not support an explicit exists precondition.`,
 			inData:  `{"a": 1}`,
@@ -198,7 +214,8 @@ operation has no map, just an update mask.`,
 
 	serverTimestampTests = []writeTest{
 		{
-			desc: "ServerTimestamp with data",
+			suffix: "st",
+			desc:   "ServerTimestamp with data",
 			comment: `A key with the special ServerTimestamp sentinel is removed from
 the data in the update operation. Instead it appears in a separate Transform operation.
 Note that in these tests, the string "ServerTimestamp" should be replaced with the
@@ -211,7 +228,8 @@ special ServerTimestamp value.`,
 			transform:     []string{"b"},
 		},
 		{
-			desc: "ServerTimestamp alone",
+			suffix: "st-alone",
+			desc:   "ServerTimestamp alone",
 			comment: `If the only values in the input are ServerTimestamps, then no
 update operation should be produced unless there are preconditions.`,
 			inData:        `{"a": "ServerTimestamp"}`,
@@ -222,7 +240,8 @@ update operation should be produced unless there are preconditions.`,
 			transform:     []string{"a"},
 		},
 		{
-			desc: "nested ServerTimestamp field",
+			suffix: "st-nested",
+			desc:   "nested ServerTimestamp field",
 			comment: `A ServerTimestamp value can occur at any depth. In this case,
 the transform applies to the field path "b.c". Since "c" is removed from the update,
 "b" becomes empty, so it is also removed from the update.`,
@@ -234,7 +253,8 @@ the transform applies to the field path "b.c". Since "c" is removed from the upd
 			transform:     []string{"b.c"},
 		},
 		{
-			desc: "multiple ServerTimestamp fields",
+			suffix: "st-multi",
+			desc:   "multiple ServerTimestamp fields",
 			comment: `A document can have more than one ServerTimestamp field.
 Since all the ServerTimestamp fields are removed, the only field in the update is "a".`,
 			commentForUpdate: `b is not in the mask because it will be set in the transform.
@@ -252,7 +272,8 @@ timestamp, but the update will delete the rest of c.`,
 	// Common errors with the ServerTimestamp and Delete sentinels.
 	sentinelErrorTests = []writeTest{
 		{
-			desc: "ServerTimestamp cannot be in an array value",
+			suffix: "st-noarray",
+			desc:   "ServerTimestamp cannot be in an array value",
 			comment: `The ServerTimestamp sentinel must be the value of a field. Firestore
 transforms don't support array indexing.`,
 			inData: `{"a": [1, 2, "ServerTimestamp"]}`,
@@ -261,7 +282,8 @@ transforms don't support array indexing.`,
 			isErr:  true,
 		},
 		{
-			desc: "ServerTimestamp cannot be anywhere inside an array value",
+			suffix: "st-noarray-nested",
+			desc:   "ServerTimestamp cannot be anywhere inside an array value",
 			comment: `There cannot be an array value anywhere on the path from the document
 root to the ServerTimestamp sentinel. Firestore transforms don't support array indexing.`,
 			inData: `{"a": [1, {"b": "ServerTimestamp"}]}`,
@@ -270,7 +292,8 @@ root to the ServerTimestamp sentinel. Firestore transforms don't support array i
 			isErr:  true,
 		},
 		{
-			desc: "Delete cannot be in an array value",
+			suffix: "del-noarray",
+			desc:   "Delete cannot be in an array value",
 			comment: `The Delete sentinel must be the value of a field. Deletes are
 implemented by turning the path to the Delete sentinel into a FieldPath, and FieldPaths
 do not support array indexing.`,
@@ -280,7 +303,8 @@ do not support array indexing.`,
 			isErr:  true,
 		},
 		{
-			desc: "Delete cannot be anywhere inside an array value",
+			suffix: "del-noarray-nested",
+			desc:   "Delete cannot be anywhere inside an array value",
 			comment: `The Delete sentinel must be the value of a field. Deletes are implemented
 by turning the path to the Delete sentinel into a FieldPath, and FieldPaths do not support
 array indexing.`,
@@ -314,7 +338,7 @@ func main() {
 }
 
 func genGet(binw io.Writer) {
-	outputTest("get-1", "A call to DocumentRef.Get.", binw, &tpb.Test{
+	outputTest("get-basic", "A call to DocumentRef.Get.", binw, &tpb.Test{
 		Description: "Get a document",
 		Test: &tpb.Test_Get{&tpb.GetTest{
 			DocRefPath: docPath,
@@ -333,7 +357,7 @@ func genCreate(binw io.Writer) {
 	precond := &fspb.Precondition{
 		ConditionType: &fspb.Precondition_Exists{false},
 	}
-	for i, test := range tests {
+	for _, test := range tests {
 		var req *fspb.CommitRequest
 		if !test.isErr {
 			req = newCommitRequest(test.outData, test.mask, precond, test.transform)
@@ -347,7 +371,7 @@ func genCreate(binw io.Writer) {
 				IsError:    test.isErr,
 			}},
 		}
-		outputTest(fmt.Sprintf("create-%d", i+1), test.comment, binw, tp)
+		outputTest(fmt.Sprintf("create-%s", test.suffix), test.comment, binw, tp)
 	}
 
 }
@@ -359,6 +383,7 @@ func genSet(binw io.Writer) {
 	tests = append(tests, sentinelErrorTests...)
 	tests = append(tests, []writeTest{
 		{
+			suffix:  "mergeall",
 			desc:    "MergeAll",
 			comment: "The MergeAll option with a simple piece of data.",
 			inData:  `{"a": 1, "b": 2}`,
@@ -367,7 +392,8 @@ func genSet(binw io.Writer) {
 			mask:    []string{"a", "b"},
 		},
 		{
-			desc: "MergeAll with nested fields", // go/set-update #3
+			suffix: "mergeall-nested",             // go/set-update #3
+			desc:   "MergeAll with nested fields", // go/set-update #3
 			comment: `MergeAll with nested fields results in an update mask that
 includes entries for all the leaf fields.`,
 			inData:  `{"h": { "g": 3, "f": 4 }}`,
@@ -376,6 +402,7 @@ includes entries for all the leaf fields.`,
 			mask:    []string{"h.f", "h.g"},
 		},
 		{
+			suffix:  "merge",
 			desc:    "Merge with a field",
 			comment: `Fields in the input data but not in a merge option are pruned.`,
 			inData:  `{"a": 1, "b": 2}`,
@@ -384,7 +411,8 @@ includes entries for all the leaf fields.`,
 			mask:    []string{"a"},
 		},
 		{
-			desc: "Merge with a nested field", // go/set-update #4
+			suffix: "merge-nested",              // go/set-update #4
+			desc:   "Merge with a nested field", // go/set-update #4
 			comment: `A merge option where the field is not at top level.
 Only fields mentioned in the option are present in the update operation.`,
 			inData:  `{"h": {"g": 4, "f": 5}}`,
@@ -393,7 +421,8 @@ Only fields mentioned in the option are present in the update operation.`,
 			mask:    []string{"h.g"},
 		},
 		{
-			desc: "Merge field is not a leaf", // go/set-update #5
+			suffix: "merge-nonleaf",             // go/set-update #5
+			desc:   "Merge field is not a leaf", // go/set-update #5
 			comment: `If a field path is in a merge option, the value at that path
 replaces the stored value. That is true even if the value is complex.`,
 			inData:  `{"h": {"g": 5, "f": 6}, "e": 7}`,
@@ -402,6 +431,7 @@ replaces the stored value. That is true even if the value is complex.`,
 			mask:    []string{"h"},
 		},
 		{
+			suffix:  "merge-fp",
 			desc:    "Merge with FieldPaths",
 			comment: `A merge with fields that use special characters.`,
 			inData:  `{"*": {"~": true}}`,
@@ -410,7 +440,8 @@ replaces the stored value. That is true even if the value is complex.`,
 			mask:    []string{"`*`.`~`"},
 		},
 		{
-			desc: "ServerTimestamp with MergeAll",
+			suffix: "st-mergeall",
+			desc:   "ServerTimestamp with MergeAll",
 			comment: `Just as when no merge option is specified, ServerTimestamp
 sentinel values are removed from the data in the update operation and become
 transforms.`,
@@ -421,6 +452,7 @@ transforms.`,
 			transform: []string{"b"},
 		},
 		{
+			suffix: "st-merge-both",
 			desc:   "ServerTimestamp with Merge of both fields",
 			inData: `{"a": 1, "b": "ServerTimestamp"}`,
 			comment: `Just as when no merge option is specified, ServerTimestamp
@@ -432,7 +464,8 @@ transforms.`,
 			transform: []string{"b"},
 		},
 		{
-			desc: "If is ServerTimestamp not in Merge, no transform",
+			suffix: "st-nomerge",
+			desc:   "If is ServerTimestamp not in Merge, no transform",
 			comment: `If the ServerTimestamp value is not mentioned in a merge option,
 then it is pruned from the data but does not result in a transform.`,
 			inData:  `{"a": 1, "b": "ServerTimestamp"}`,
@@ -441,7 +474,8 @@ then it is pruned from the data but does not result in a transform.`,
 			mask:    []string{"a"},
 		},
 		{
-			desc: "If no ordinary values in Merge, no write",
+			suffix: "merge-nowrite",
+			desc:   "If no ordinary values in Merge, no write",
 			comment: `If all the fields in the merge option have ServerTimestamp
 values, then no update operation is produced, only a transform.`,
 			inData:    `{"a": 1, "b": "ServerTimestamp"}`,
@@ -450,7 +484,8 @@ values, then no update operation is produced, only a transform.`,
 		},
 		// Errors:
 		{
-			desc: "Merge fields must all be present in data",
+			suffix: "merge-present",
+			desc:   "Merge fields must all be present in data",
 			comment: `The client signals an error if a merge option mentions a path
 that is not in the input data.`,
 			inData: `{"a": 1}`,
@@ -458,7 +493,8 @@ that is not in the input data.`,
 			isErr:  true,
 		},
 		{
-			desc: "Delete cannot appear in an unmerged field",
+			suffix: "del-nomerge",
+			desc:   "Delete cannot appear in an unmerged field",
 			comment: `The client signals an error if the Delete sentinel is in the
 input data, but not selected by a merge option, because this is most likely a programming
 bug.`,
@@ -468,7 +504,7 @@ bug.`,
 		},
 	}...)
 
-	for i, test := range tests {
+	for _, test := range tests {
 		var req *fspb.CommitRequest
 		if !test.isErr {
 			req = newCommitRequest(test.outData, test.mask, nil, test.transform)
@@ -483,7 +519,7 @@ bug.`,
 				IsError:    test.isErr,
 			}},
 		}
-		outputTest(fmt.Sprintf("set-%d", i+1), test.comment, binw, tp)
+		outputTest(fmt.Sprintf("set-%s", test.suffix), test.comment, binw, tp)
 	}
 }
 
@@ -495,6 +531,7 @@ func genUpdate(binw io.Writer) {
 	tests = append(tests, sentinelErrorTests...)
 	tests = append(tests, []writeTest{
 		{
+			suffix:  "split",
 			desc:    "split on dots",
 			comment: `The Update method splits top-level keys at dots.`,
 			inData:  `{"a.b.c": 1}`,
@@ -502,7 +539,8 @@ func genUpdate(binw io.Writer) {
 			mask:    []string{"a.b.c"},
 		},
 		{
-			desc: "Split on dots for top-level keys only", // go/set-update #6
+			suffix: "split-top-level",                       // go/set-update #6
+			desc:   "Split on dots for top-level keys only", // go/set-update #6
 			comment: `The Update method splits only top-level keys at dots. Keys at
 other levels are taken literally.`,
 			inData:  `{"h.g": {"j.k": 6}}`,
@@ -510,7 +548,8 @@ other levels are taken literally.`,
 			mask:    []string{"h.g"},
 		},
 		{
-			desc: "Delete with a dotted field",
+			suffix: "del-dot",
+			desc:   "Delete with a dotted field",
 			comment: `After expanding top-level dotted fields, fields with Delete
 values are pruned from the output data, but appear in the update mask.`,
 			inData:  `{"a": 1, "b.c": "Delete", "b.d": 2}`,
@@ -519,7 +558,8 @@ values are pruned from the output data, but appear in the update mask.`,
 		},
 
 		{
-			desc: "ServerTimestamp with dotted field",
+			suffix: "st-dot",
+			desc:   "ServerTimestamp with dotted field",
 			comment: `Like other uses of ServerTimestamp, the data is pruned and the
 field does not appear in the update mask, because it is in the transform. In this case
 An update operation is produced just to hold the precondition.`,
@@ -528,6 +568,7 @@ An update operation is produced just to hold the precondition.`,
 		},
 		// Errors
 		{
+			suffix:  "badchar",
 			desc:    "invalid character",
 			comment: `The keys of the data given to Update are interpreted, unlike those of Create and Set. They cannot contain special characters.`,
 			inData:  `{"a~b": 1}`,
@@ -535,7 +576,7 @@ An update operation is produced just to hold the precondition.`,
 		},
 	}...)
 
-	for i, test := range tests {
+	for _, test := range tests {
 		tp := &tpb.Test{
 			Description: test.desc,
 			Test: &tpb.Test_Update{&tpb.UpdateTest{
@@ -550,7 +591,7 @@ An update operation is produced just to hold the precondition.`,
 		if test.commentForUpdate != "" {
 			comment += "\n\n" + test.commentForUpdate
 		}
-		outputTest(fmt.Sprintf("update-%d", i+1), comment, binw, tp)
+		outputTest(fmt.Sprintf("update-%s", test.suffix), comment, binw, tp)
 	}
 }
 
@@ -562,7 +603,8 @@ func genUpdatePaths(binw io.Writer) {
 	tests = append(tests, sentinelErrorTests...)
 	tests = append(tests, []writeTest{
 		{
-			desc: "multiple-element field path",
+			suffix: "fp-multi",
+			desc:   "multiple-element field path",
 			comment: `The UpdatePaths or equivalent method takes a list of FieldPaths.
 Each FieldPath is a sequence of uninterpreted path components.`,
 			paths:   [][]string{{"a", "b"}},
@@ -571,6 +613,7 @@ Each FieldPath is a sequence of uninterpreted path components.`,
 			mask:    []string{"a.b"},
 		},
 		{
+			suffix:  "fp-nosplit",                               // go/set-update #7, approx.
 			desc:    "FieldPath elements are not split on dots", // go/set-update #7, approx.
 			comment: `FieldPath components are not split on dots.`,
 			paths:   [][]string{{"a.b", "f.g"}},
@@ -579,6 +622,7 @@ Each FieldPath is a sequence of uninterpreted path components.`,
 			mask:    []string{"`a.b`.`f.g`"},
 		},
 		{
+			suffix:  "special-chars",
 			desc:    "special characters",
 			comment: `FieldPaths can contain special characters.`,
 			paths:   [][]string{{"*", "~"}, {"*", "`"}},
@@ -588,6 +632,7 @@ Each FieldPath is a sequence of uninterpreted path components.`,
 		},
 		// Errors
 		{
+			suffix:  "fp-empty",
 			desc:    "empty field path",
 			comment: `A FieldPath of length zero is invalid.`,
 			paths:   [][]string{{}},
@@ -595,6 +640,7 @@ Each FieldPath is a sequence of uninterpreted path components.`,
 			isErr:   true,
 		},
 		{
+			suffix:  "fp-dup",
 			desc:    "duplicate field path",
 			comment: `The same field cannot occur more than once.`,
 			paths:   [][]string{{"a"}, {"b"}, {"a"}},
@@ -603,7 +649,7 @@ Each FieldPath is a sequence of uninterpreted path components.`,
 		},
 	}...)
 
-	for i, test := range tests {
+	for _, test := range tests {
 		if len(test.paths) != len(test.values) {
 			log.Fatalf("test %s has mismatched paths and values", test.desc)
 		}
@@ -622,28 +668,32 @@ Each FieldPath is a sequence of uninterpreted path components.`,
 		if test.commentForUpdate != "" {
 			comment += "\n\n" + test.commentForUpdate
 		}
-		outputTest(fmt.Sprintf("update-paths-%d", i+1), test.comment, binw, tp)
+		outputTest(fmt.Sprintf("update-paths-%s", test.suffix), test.comment, binw, tp)
 	}
 }
 
 func genDelete(binw io.Writer) {
-	for i, test := range []struct {
+	for _, test := range []struct {
+		suffix  string
 		desc    string
 		comment string
 		precond *fspb.Precondition
 		isErr   bool
 	}{
 		{
+			suffix:  "no-precond",
 			desc:    "delete without precondition",
 			comment: `An ordinary Delete call.`,
 			precond: nil,
 		},
 		{
+			suffix:  "time-precond",
 			desc:    "delete with last-update-time precondition",
 			comment: `Delete supports a last-update-time precondition.`,
 			precond: updateTimePrecondition,
 		},
 		{
+			suffix:  "exists-precond",
 			desc:    "delete with exists precondition",
 			comment: `Delete supports an exists precondition.`,
 			precond: existsTruePrecondition,
@@ -668,7 +718,7 @@ func genDelete(binw io.Writer) {
 				IsError:      test.isErr,
 			}},
 		}
-		outputTest(fmt.Sprintf("delete-%d", i+1), test.comment, binw, tp)
+		outputTest(fmt.Sprintf("delete-%s", test.suffix), test.comment, binw, tp)
 	}
 }
 
@@ -747,7 +797,19 @@ func toFieldPaths(fps [][]string) []*tpb.FieldPath {
 	return ps
 }
 
+var filenames = map[string]bool{}
+
 func outputTest(filename, comment string, binw io.Writer, t *tpb.Test) {
+	if strings.HasSuffix(filename, "-") {
+		log.Fatalf("test %q missing suffix", t.Description)
+	}
+	if strings.ContainsAny(filename, " \t\n',") {
+		log.Fatalf("bad character in filename %q", filename)
+	}
+	if filenames[filename] {
+		log.Fatalf("duplicate filename %q", filename)
+	}
+	filenames[filename] = true
 	basename := filepath.Join(*outputDir, filename+".textproto")
 	if err := writeTestToFile(basename, comment, binw, t); err != nil {
 		log.Fatalf("writing test: %v", err)
