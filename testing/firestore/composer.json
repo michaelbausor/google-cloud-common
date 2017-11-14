@@ -1,0 +1,16 @@
+{
+    "name": "michaelbausor/firestore",
+    "autoload": {
+        "psr-4": {
+            "": "output"
+        },
+        "files": [
+            "varint.php"
+        ]
+    },
+    "require": {
+        "google/protobuf": "^3.5",
+        "google/proto-client": "^0.25",
+        "google/gax": "^0.25"
+    }
+}
